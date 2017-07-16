@@ -1,9 +1,8 @@
 /**
- *mongodb 数据库配置文件
+ * mongodb 数据库配置文件
+ * [exports description]
+ * @type {Object}
  */
-
-
-   
 module.exports = {
 	host:'localhost',
 	port: '27017',

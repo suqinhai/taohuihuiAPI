@@ -1,31 +1,40 @@
 'use strict';
-
-
-// 路由配置
-
+/** 
+ * 路由配置
+ * [exports description]
+ * @type {Object}
+ */
 module.exports = {
-    '/index': {
-        get: 'view.index'
+
+    // 用户管理路由
+    '/admin/register': {
+        'post': 'admin.register'
     },
-    '/': {
-        get: 'view.index'
+    '/admin/login': {
+        'get': 'admin.login'
     },
-    '/user/add': {
-        get: 'user.add'
+    '/admin/modifyPassWord': {
+        'post': 'admin.modifyPassWord'
+    },
+    '/admin/logout': {
+        'post': 'admin.logout'
     },
 
-    '/index/test': {
-        get: 'index.test'
-    },
 
-    //用户
-    '/goods/get': {
-        get: 'goods.get'
+    // 首页菜单路由
+    '/nav/get': {
+        'get': 'nav.get'
     },
+    '/nav/add': {
+        'post': 'nav.add'
+    },
+    '/nav/modify': {
+        'post': 'nav.modify'
+    },
+    '/nav/del': {
+        'post': 'nav.del'
+    },
+    
 
-    //用户
-    '/goods/add': {
-        post: 'goods.add'
-    },
 
 }

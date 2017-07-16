@@ -3,22 +3,17 @@
 var mongoose = require('mongoose');
 
 var userSchema = new mongoose.Schema({
-	name:{
+	user:{
 		type: String,
 		required: true
 	},
-	pwd:{
+	passwd:{
 		type: String,
 		required: true
-	},
-	auth:{
-		type: mongoose.Schema.Types.ObjectId,
-	    ref: 'Activites',
-	    required: true
 	}
 }, {
-    collection: 'tb_admin',
+    collection: 'tb_user',
     id: false
 });
 
-module.exports = mongoose.model('Admin', userSchema);
+module.exports = mongoose.model('User', userSchema);

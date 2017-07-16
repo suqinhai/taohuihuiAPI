@@ -1,9 +1,8 @@
 'use strict';
 var util = require('../util/util.js');
-var productModel = require('../models/product.model.js');
-
+var navModel = require('../models/nav.model.js');
 /**
- * 获取商品
+ * 获取首页导航列表
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -12,8 +11,7 @@ var productModel = require('../models/product.model.js');
 exports.get = function(req, res, next) {
     var param = req.query || req.params
     var data = {};
-
-    productModel.find(data)
+    navModel.find(data)
         .lean()
         .exec(function(err, results) {
             res.status(200).json({
@@ -24,7 +22,7 @@ exports.get = function(req, res, next) {
 }
 
 /**
- * 添加商品
+ * 添加首页导航列表
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -33,25 +31,22 @@ exports.get = function(req, res, next) {
 exports.add = function(req, res, next) {
     var param = req.query || req.params
     var data = {
-        'picUrl': param.picUrl, //商品图片
-        'title': param.title, // 标题
-        'origPrice': param.origPrice, //原价
-        'nowPrice': param.nowPrice, //现价
-        'des': param.des, //描述
+        'name': param.name,
+        'sort': parseInt(param.sort),
         'createTime':util.dataFormat(new Date()),
         'updateTime':util.dataFormat(new Date()),
     };
-
-    productModel.create(data, function(err, results) {
+    navModel.create(data, function(err, results) {
         res.status(200).json({
             'code': '1',
             'data': results
         });
-    });
+    })
+
 }
 
 /**
- * 修改商品
+ * 修改首页导航列表
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -59,39 +54,36 @@ exports.add = function(req, res, next) {
  */
 exports.modify = function(req, res, next) {
     var param = req.query || req.params
-    var _id = param.id
+    var _id = param._id
     var data = {
-        'picUrl': param.picUrl, //商品图片
-        'title': param.title, // 标题
-        'origPrice': param.origPrice, //原价
-        'nowPrice': param.nowPrice, //现价
-        'des': param.des, //描述
-        'updateTime':util.dataFormat(new Date()),
+        'name': param.name,
+        'sort': parseInt(param.sort),
+        'updateTime':util.dataFormat(new Date())
     };
-    productModel.update({ '_id': _id }, data, function(err, results) {
+    navModel.update({ '_id': _id }, data, function(err, results) {
         res.status(200).json({
             'code': '1',
             'data': results
         });
-    });
+    })
 }
 
 /**
- * 删除商品
+ * 删除首页导航列表
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
  * @return   {[type]}
  */
 exports.del = function(req, res, next) {
-    var param = req.query || req.params;
+    var param = req.query || req.params
     var data = {
-        '_id': param.id
+        '_id': param._id
     };
-    productModel.remove(data, function(err, results) {
+    navModel.remove(data, function(err, results) {
         res.status(200).json({
             'code': '1',
             'data': results
         });
-    });
+    })
 }
