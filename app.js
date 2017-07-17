@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 
+var validator = require('./lib/validator.lib');
 var viewsMap = require('./lib/views.map.lib');
 var routeMap = require('./lib/route.map.lib');
 
@@ -33,6 +34,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use()
 app.use('/', viewsMap);
 app.use('/', routeMap);
 
