@@ -1,7 +1,7 @@
 'use strict';
 
 var spawn = require("child_process").spawn;
-var goodsModel = require('../models/goods.model.js');
+// var goodsModel = require('../models/goods.model.js');
 
 var goods = {
   start: function() {

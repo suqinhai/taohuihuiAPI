@@ -35,3 +35,45 @@ exports.dataFormat = function(t, format) {
         }
     });
 }
+
+/**
+ * 字符串md5加密
+ * @Author   suqinhai
+ * @Contact  467456744@qq.com
+ * @DateTime 2017-07-17
+ * @param    {[param]}         param [String]
+ * @return   {[type]}            
+ */
+var crypto = require('crypto');
+var fs = require('fs');
+
+exports.md5 = function(param) {
+    //crypto模块功能是加密并生成各种散列,此处所示为MD5方式加密
+    var md5 = crypto.createHash('md5');   
+    return md5.update(param).digest('hex');
+}
+
+/**
+ * @Author   suqinhai
+ * @Contact  467456744@qq.com
+ * @DateTime 2017-07-17
+ * @param    {[Obejct]}         file [文件stream流]
+ * @return   {[type]}           
+ */
+exports.md5File = function(file) {
+    var md5File
+    var hash = crypto.createHash('md5');
+
+    file.on('data', function(){
+        hash.update.bind(hash)
+    });
+
+    return new Promise(function(resolve, reject) {
+        file.on('end', function () {
+           resolve(hash.digest('hex'));
+        });
+    })
+}
+
+
+

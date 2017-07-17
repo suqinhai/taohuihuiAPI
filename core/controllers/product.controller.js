@@ -3,7 +3,7 @@ var util = require('../util/util.js');
 var productModel = require('../models/product.model.js');
 
 /**
- * 获取商品
+ * 获取首页商品
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -11,9 +11,16 @@ var productModel = require('../models/product.model.js');
  */
 exports.get = function(req, res, next) {
     var param = req.query || req.params
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
     var data = {};
+    param.name ? data.name = new RegExp(param.name) : '';
 
+
+    
     productModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
         .lean()
         .exec(function(err, results) {
             res.status(200).json({
@@ -24,7 +31,7 @@ exports.get = function(req, res, next) {
 }
 
 /**
- * 添加商品
+ * 添加首页商品
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -33,13 +40,13 @@ exports.get = function(req, res, next) {
 exports.add = function(req, res, next) {
     var param = req.query || req.params
     var data = {
-        'picUrl': param.picUrl, //商品图片
+        'picUrl': param.picUrl, //首页商品图片
         'title': param.title, // 标题
         'origPrice': param.origPrice, //原价
         'nowPrice': param.nowPrice, //现价
         'des': param.des, //描述
-        'createTime':util.dataFormat(new Date()),
-        'updateTime':util.dataFormat(new Date()),
+        'createTime': util.dataFormat(new Date()),
+        'updateTime': util.dataFormat(new Date()),
     };
 
     productModel.create(data, function(err, results) {
@@ -51,7 +58,7 @@ exports.add = function(req, res, next) {
 }
 
 /**
- * 修改商品
+ * 修改首页商品
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -61,12 +68,12 @@ exports.modify = function(req, res, next) {
     var param = req.query || req.params
     var _id = param.id
     var data = {
-        'picUrl': param.picUrl, //商品图片
+        'picUrl': param.picUrl, //首页商品图片
         'title': param.title, // 标题
         'origPrice': param.origPrice, //原价
         'nowPrice': param.nowPrice, //现价
         'des': param.des, //描述
-        'updateTime':util.dataFormat(new Date()),
+        'updateTime': util.dataFormat(new Date()),
     };
     productModel.update({ '_id': _id }, data, function(err, results) {
         res.status(200).json({
@@ -77,7 +84,7 @@ exports.modify = function(req, res, next) {
 }
 
 /**
- * 删除商品
+ * 删除首页商品
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -95,3 +102,39 @@ exports.del = function(req, res, next) {
         });
     });
 }
+
+/**
+ *
+ * 首页海报轮播
+ * @Author   suqinhai
+ * @Contact  467456744@qq.com
+ * @DateTime 2017-07-17
+ * @param    {[type]}         req  [description]
+ * @param    {[type]}         res  [description]
+ * @param    {Function}       next [description]
+ * @return   {[type]}              [description]
+ */
+
+exports.posterGet = function(req, res, next) {
+    var param = req.query || req.params
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+    var data = {};
+    param.name ? data.name = new RegExp(param.name) : '';
+
+
+    
+    productModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .lean()
+        .exec(function(err, results) {
+            res.status(200).json({
+                'code': '1',
+                'data': results
+            });
+        })
+}
+
+
+

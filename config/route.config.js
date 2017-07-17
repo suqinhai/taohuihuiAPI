@@ -34,6 +34,21 @@ module.exports = {
     '/nav/del': {
         'post': 'nav.del'
     },
+
+
+    // 首页海报轮播
+    '/poster/get': {
+        'get': 'poster.get'
+    },
+    '/poster/add': {
+        'post': 'poster.add'
+    },
+    '/poster/modify': {
+        'post': 'poster.modify'
+    },
+    '/poster/del': {
+        'post': 'poster.del'
+    },
     
 
 

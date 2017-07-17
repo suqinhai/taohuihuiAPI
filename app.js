@@ -6,10 +6,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 
-var validator = require('./lib/validator.lib');
-var viewsMap = require('./lib/views.map.lib');
-var routeMap = require('./lib/route.map.lib');
-
+var validator = require('./lib/validator.lib.js');
+var viewsMap = require('./lib/views.map.lib.js');
+var routeMap = require('./lib/route.map.lib.js');
+var uploadFile = require('./core/controllers/public.controller.js');
 var app = express();
 
 // view engine setup
@@ -34,10 +34,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use()
+app.use(validator());
 app.use('/', viewsMap);
 app.use('/', routeMap);
-
+app.use('/', uploadFile);
 
 
 // catch 404 and forward to error handler
