@@ -29,7 +29,7 @@ exports.get = function(req, res, next) {
 }
 
 /**
- * 添加首页删除首页轮播
+ * 添加首页轮播
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -78,7 +78,7 @@ exports.add = function(req, res, next) {
 }
 
 /**
- * 修改首页删除首页轮播
+ * 修改首页轮播
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -132,7 +132,7 @@ exports.modify = function(req, res, next) {
 }
 
 /**
- * 删除首页删除首页轮播
+ * 删除首页轮播
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
