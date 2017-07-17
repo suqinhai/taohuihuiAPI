@@ -18,13 +18,7 @@ app.set('views', path.join(__dirname, './core/views/'));
 app.set( 'view engine', 'html' );
 app.engine( '.html', require( 'ejs' ).__express );
 
-app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: false,
-  maxAge: 60000*24*30,
-  cookie: { secure: false,maxAge: 60000*24*30 }
-}));
+app.use(session(require('./config/session.config.js')));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

@@ -20,14 +20,14 @@ exports.register = function(req, res, next) {
         .then(function(result) {
             if (result) {
                 res.status(200).json({
-                    'code':'1',
+                    'code': '1',
                     'msg': '已存在该用户！'
                 });
             } else {
                 /*新增用户*/
                 userModel.create({ 'user': user, 'passwd': passwd });
                 res.status(200).json({
-                    'code':'1',
+                    'code': '1',
                     'msg': '新增用户成功！'
                 });
             }
@@ -62,12 +62,12 @@ exports.login = function(req, res, next) {
 
             if (result) {
                 res.status(200).json({
-                    'code':'1',
+                    'code': '1',
                     'msg': '登陆成功！'
                 });
             } else {
                 res.status(200).json({
-                    'code':'1',
+                    'code': '1',
                     'msg': '登陆失败！'
                 });
             }
@@ -82,7 +82,7 @@ exports.login = function(req, res, next) {
  * @return   {[type]}
  */
 
-exports.modifyPassWord = function(req, res, next){
+exports.modifyPassWord = function(req, res, next) {
     var param = req.query || req.params
     var user = param.user;
     var passwd = param.passwd;
@@ -92,7 +92,7 @@ exports.modifyPassWord = function(req, res, next){
         .then(function(result) {
             if (!result) {
                 res.status(200).json({
-                    'code':'1',
+                    'code': '1',
                     'msg': '不存在该用户！'
                 });
             } else {
@@ -102,12 +102,12 @@ exports.modifyPassWord = function(req, res, next){
                     .then(function(result) {
                         if (result) {
                             res.status(200).json({
-                                'code':'1',
+                                'code': '1',
                                 'msg': '修改密码成功！'
                             });
                         } else {
                             res.status(200).json({
-                                'code':'1',
+                                'code': '1',
                                 'msg': '修改密码失败！'
                             });
                         }
@@ -126,11 +126,11 @@ exports.modifyPassWord = function(req, res, next){
  * @return   {[type]}
  */
 
-exports.logout =  function(req, res, next) {
+exports.logout = function(req, res, next) {
     req.session.userId = null;
     if (!req.session.userId) {
         res.status(200).json({
-            'code':'1',
+            'code': '1',
             'msg': '注销成功！'
         });
     }

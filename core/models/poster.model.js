@@ -31,4 +31,4 @@ var posterSchema = new mongoose.Schema({
     id: false
 });
 
-module.exports = mongoose.model('poster', navSchema);
+module.exports = mongoose.model('poster', posterSchema);
