@@ -44,7 +44,8 @@ exports.add = function(req, res, next) {
         'title': param.title, // 标题
         'origPrice': param.origPrice, //原价
         'nowPrice': param.nowPrice, //现价
-        'des': param.des, //描述
+        ''
+        'des': param.des, //推荐理由
         'createTime': util.dataFormat(new Date()),
         'updateTime': util.dataFormat(new Date()),
     };

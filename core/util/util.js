@@ -46,7 +46,6 @@ exports.dataFormat = function(t, format) {
  */
 var crypto = require('crypto');
 var fs = require('fs');
-
 exports.md5 = function(param) {
     //crypto模块功能是加密并生成各种散列,此处所示为MD5方式加密
     var md5 = crypto.createHash('md5');   
