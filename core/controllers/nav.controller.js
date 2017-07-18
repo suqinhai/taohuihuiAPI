@@ -38,7 +38,7 @@ exports.get = function(req, res, next) {
  */
 exports.add = function(req, res, next) {
     var param = req.query || req.params
-    req.checkBody({
+    req.checkQuery({
         'name': {
             notEmpty: {
                 options: [true],
@@ -85,7 +85,7 @@ exports.add = function(req, res, next) {
  */
 exports.modify = function(req, res, next) {
     var param = req.query || req.params
-    req.checkBody({
+    req.checkQuery({
         '_id': {
             notEmpty: {
                 options: [true],
@@ -137,7 +137,7 @@ exports.modify = function(req, res, next) {
  */
 exports.del = function(req, res, next) {
     var param = req.query || req.params
-    req.checkBody({
+    req.checkQuery({
         '_id': {
             notEmpty: {
                 options: [true],

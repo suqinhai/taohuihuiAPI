@@ -13,7 +13,7 @@ const userModel = require('../models/user.model.js');
 
 exports.register = function(req, res, next) {
 
-    req.checkBody({
+    req.checkQuery({
         'name': {
             notEmpty: {
                 options: [true],
@@ -88,7 +88,7 @@ exports.register = function(req, res, next) {
 
 exports.login = function(req, res, next) {
 
-    req.checkBody({
+    req.checkQuery({
         'user': {
             notEmpty: {
                 options: [true],
@@ -153,7 +153,7 @@ exports.login = function(req, res, next) {
 
 exports.modifyPassWord = function(req, res, next) {
 
-     req.checkBody({
+     req.checkQuery({
         'name': {
             notEmpty: {
                 options: [true],

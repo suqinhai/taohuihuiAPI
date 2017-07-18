@@ -7,20 +7,20 @@
 module.exports = {
 
     // 后台用户管理路由
-    '/admin/register': {
+    '/taohuihui/admin/register': {
         'post': 'admin.register'
     },
-    '/admin/login': {
-        'get': 'admin.login'
+    '/taohuihui/admin/login': {
+        'post': 'admin.login'
     },
-    '/admin/modifyPassWord': {
+    '/taohuihui/admin/modifyPassWord': {
         'post': 'admin.modifyPassWord'
     },
-    '/admin/logout': {
-        'post': 'admin.logout'
+    '/taohuihui/admin/logout': {
+        'get': 'admin.logout'
     },
 
-    // 后台用户管理路由
+    // 前台用户管理路由
     '/user/register': {
         'post': 'user.register'
     },
@@ -36,16 +36,16 @@ module.exports = {
 
 
     // 首页菜单路由
-    '/nav/get': {
+    '/taohuihui/nav/get': {
         'get': 'nav.get'
     },
-    '/nav/add': {
+    '/taohuihui/nav/add': {
         'post': 'nav.add'
     },
-    '/nav/modify': {
+    '/taohuihui/nav/modify': {
         'post': 'nav.modify'
     },
-    '/nav/del': {
+    '/taohuihui/nav/del': {
         'post': 'nav.del'
     },
 

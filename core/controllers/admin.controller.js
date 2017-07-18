@@ -13,7 +13,7 @@ const adminServers = require('../servers/admin.servers.js');
 
 exports.register = function(req, res, next) {
 
-    req.checkBody({
+    req.checkQuery({
         'name': {
             notEmpty: {
                 options: [true],
@@ -48,14 +48,13 @@ exports.register = function(req, res, next) {
     }
 
     var param = req.query || req.params
-
     var data = {
         'name':param.name,
         'email':param.email,
         'user':param.user,
         'passwd':param.passwd,
         'createTime':util.dataFormat(new Date()),
-        'updateTime':util.dataFormat(new Date()),
+        'updateTime':util.dataFormat(new Date())
     }
 
     /*判断有没有这个用户*/
@@ -68,11 +67,17 @@ exports.register = function(req, res, next) {
                 });
             } else {
                 /*新增用户*/
-                adminModel.create(data);
-                res.status(200).json({
-                    'code': '1',
-                    'msg': '新增用户成功！'
-                });
+                adminModel.create(data,function(err,data){
+                    if (err){
+                        console.log(err)
+                        res.send('111')
+                    }
+                    res.status(200).json({
+                        'code': '1',
+                        'msg': '新增用户成功！'
+                    });
+                })
+                
             }
         });
 }
@@ -110,34 +115,28 @@ exports.login = function(req, res, next) {
         });
     }
 
-    var param = req.query || req.params
+    var param = req.body
     var data = {
         user:param.user,
         passwd:param.passwd,
     }
 
-
-    /*已登陆判断*/
-    if (req.session.id) {
-        res.status(200).send('用户已登陆！');
-        return false;
-    }
-
     /*登陆判断*/
     adminModel.findOne(data)
-        .then(function(result) {
-
-            req.session.userId = result.id;
-
+        .select('name user email createTime updateTime')
+        .lean()
+        .exec(function(err, result) {
             if (result) {
+                req.session.userId = result._id;
                 res.status(200).json({
                     'code': '1',
-                    'msg': '登陆成功！'
+                    'msg': '登陆成功！',
+                    'data':result
                 });
             } else {
                 res.status(200).json({
-                    'code': '1',
-                    'msg': '登陆失败！'
+                    'code': '0',
+                    'msg': '账号或密码错误！'
                 });
             }
         });
@@ -153,7 +152,7 @@ exports.login = function(req, res, next) {
 
 exports.modifyPassWord = function(req, res, next) {
 
-     req.checkBody({
+     req.checkQuery({
         'name': {
             notEmpty: {
                 options: [true],
@@ -220,7 +219,7 @@ exports.modifyPassWord = function(req, res, next) {
                                 'msg': '修改失败！'
                             });
                         }
-                    });
+                });
             }
 
         });

@@ -11,7 +11,7 @@ const adminSchema = new mongoose.Schema({
 		type: String,
 		required: false
 	},
-	admin:{
+	user:{
 		type: String,
 		required: true
 	},
