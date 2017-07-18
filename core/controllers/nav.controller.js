@@ -1,6 +1,6 @@
 'use strict';
-var util = require('../util/util.js');
-var navModel = require('../models/nav.model.js');
+const util = require('../util/util.js');
+const navModel = require('../models/nav.model.js');
 
 /**
  * 获取首页导航列表

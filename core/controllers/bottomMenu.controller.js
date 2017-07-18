@@ -1,8 +1,9 @@
 'use strict';
 const util = require('../util/util.js');
-const posterModel = require('../models/poster.model.js');
+const bottomMenuModel = require('../models/bottomMenu.model.js');
+
 /**
- * 获取首页轮播
+ * 获取首页底部浮动菜单
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -15,10 +16,10 @@ exports.get = function(req, res, next) {
     var data = {};
     param.name ? data.name = new RegExp(param.name) : '';
 
-    posterModel.find(data)
+    bottomMenuModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('url sort title alt createTime updateTime')
+        .select('name url sort createTime updateTime')
         .lean()
         .exec(function(err, results) {
             res.status(200).json({
@@ -29,7 +30,7 @@ exports.get = function(req, res, next) {
 }
 
 /**
- * 添加首页轮播
+ * 添加首页底部浮动菜单
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -38,6 +39,12 @@ exports.get = function(req, res, next) {
 exports.add = function(req, res, next) {
     var param = req.query || req.params
     req.checkBody({
+        'name': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'name 不能为空'
+            }
+        },
         'url': {
             notEmpty: {
                 options: [true],
@@ -50,7 +57,7 @@ exports.add = function(req, res, next) {
                 errorMessage: 'sort 不能为空'
             },
             isNumber:{ errorMessage: 'sort 不是一个number类型'}
-        },
+        }
     })
 
     if (req.validationErrors()) {
@@ -61,14 +68,14 @@ exports.add = function(req, res, next) {
     }
 
     var data = {
+        'name': param.name,
         'url': param.url,
         'sort': parseInt(param.sort),
-        'title': param.title,
-        'alt': param.alt,
         'createTime':util.dataFormat(new Date()),
         'updateTime':util.dataFormat(new Date()),
     };
-    posterModel.create(data, function(err, results) {
+    
+    bottomMenuModel.create(data, function(err, results) {
         res.status(200).json({
             'code': '1',
             'data': results
@@ -78,7 +85,7 @@ exports.add = function(req, res, next) {
 }
 
 /**
- * 修改首页轮播
+ * 修改首页底部浮动菜单
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -99,13 +106,19 @@ exports.modify = function(req, res, next) {
                 errorMessage: 'name 不能为空'
             }
         },
+        'url': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'url 不能为空'
+            }
+        },
         'sort': {
             notEmpty: {
                 options: [true],
                 errorMessage: 'sort 不能为空'
             },
             isNumber:{ errorMessage: 'sort 不是一个number类型'}
-        },
+        }
     })
 
     if (req.validationErrors()) {
@@ -117,13 +130,12 @@ exports.modify = function(req, res, next) {
 
     var _id = param._id
     var data = {
+        'name': param.name,
         'url': param.url,
         'sort': parseInt(param.sort),
-        'title': param.title,
-        'alt': param.alt,
         'updateTime':util.dataFormat(new Date())
     };
-    posterModel.update({ '_id': _id }, data, function(err, results) {
+    bottomMenuModel.update({ '_id': _id }, data, function(err, results) {
         res.status(200).json({
             'code': '1',
             'data': results
@@ -132,7 +144,7 @@ exports.modify = function(req, res, next) {
 }
 
 /**
- * 删除首页轮播
+ * 删除首页底部浮动菜单
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -158,10 +170,16 @@ exports.del = function(req, res, next) {
     var data = {
         '_id': param._id
     };
-    posterModel.remove(data, function(err, results) {
+    bottomMenuModel.remove(data, function(err, results) {
         res.status(200).json({
             'code': '1',
             'data': results
         });
     })
 }
+
+
+
+
+
+

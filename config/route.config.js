@@ -6,7 +6,7 @@
  */
 module.exports = {
 
-    // 用户管理路由
+    // 后台用户管理路由
     '/admin/register': {
         'post': 'admin.register'
     },
@@ -18,6 +18,20 @@ module.exports = {
     },
     '/admin/logout': {
         'post': 'admin.logout'
+    },
+
+    // 后台用户管理路由
+    '/user/register': {
+        'post': 'user.register'
+    },
+    '/user/login': {
+        'get': 'user.login'
+    },
+    '/user/modifyPassWord': {
+        'post': 'user.modifyPassWord'
+    },
+    '/user/logout': {
+        'post': 'user.logout'
     },
 
 
@@ -48,6 +62,21 @@ module.exports = {
     },
     '/poster/del': {
         'post': 'poster.del'
+    },
+
+
+    // 首页底部浮动菜单
+    '/bottomMenu/get': {
+        'get': 'bottomMenu.get'
+    },
+    '/bottomMenu/add': {
+        'post': 'bottomMenu.add'
+    },
+    '/bottomMenu/modify': {
+        'post': 'bottomMenu.modify'
+    },
+    '/bottomMenu/del': {
+        'post': 'bottomMenu.del'
     },
     
 

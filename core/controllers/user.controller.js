@@ -1,7 +1,7 @@
 'use strict';
 const util = require('../util/util.js');
-const adminModel = require('../models/admin.model.js');
-const userServers = require('../servers/admin.servers.js');
+const userModel = require('../models/user.model.js');
+const userServers = require('../servers/user.servers.js');
 
 /**
  * 后台注册
@@ -59,7 +59,7 @@ exports.register = function(req, res, next) {
     }
 
     /*判断有没有这个用户*/
-    adminModel.findOne({ 'user': data.user })
+    userModel.findOne({ 'user': data.user })
         .then(function(result) {
             if (result) {
                 res.status(200).json({
@@ -68,7 +68,7 @@ exports.register = function(req, res, next) {
                 });
             } else {
                 /*新增用户*/
-                adminModel.create(data);
+                userModel.create(data);
                 res.status(200).json({
                     'code': '1',
                     'msg': '新增用户成功！'
@@ -124,7 +124,7 @@ exports.login = function(req, res, next) {
     }
 
     /*登陆判断*/
-    adminModel.findOne(data)
+    userModel.findOne(data)
         .then(function(result) {
 
             req.session.userId = result.id;
@@ -198,7 +198,7 @@ exports.modifyPassWord = function(req, res, next) {
     }
 
     /*判断有没有这个用户*/
-    adminModel.findOne({ 'user':user })
+    userModel.findOne({ 'user':user })
         .then(function(result) {
             if (!result) {
                 res.status(200).json({
@@ -208,7 +208,7 @@ exports.modifyPassWord = function(req, res, next) {
             } else {
 
                 /* 更新密码*/
-                adminModel.update({'user':user,'_id':_id}, data , function(result) {
+                userModel.update({'user':user,'_id':_id}, data , function(result) {
                         if (result) {
                             res.status(200).json({
                                 'code': '1',

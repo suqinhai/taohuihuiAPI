@@ -1,7 +1,7 @@
 'use strict';
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var posterSchema = new mongoose.Schema({
+const posterSchema = new mongoose.Schema({
 	'url':{
 		type: String,
 		required: true

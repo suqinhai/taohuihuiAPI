@@ -1,6 +1,6 @@
 'use strict';
-var util = require('../util/util.js');
-var productModel = require('../models/product.model.js');
+const util = require('../util/util.js');
+const productModel = require('../models/product.model.js');
 
 /**
  * 获取首页商品

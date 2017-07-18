@@ -1,8 +1,12 @@
 'use strict';
 const mongoose = require('mongoose');
 
-const navSchema = new mongoose.Schema({
+const bottomMenuSchema = new mongoose.Schema({
 	'name':{
+		type: String,
+		required: true
+	},
+	'url':{
 		type: String,
 		required: true
 	},
@@ -19,8 +23,8 @@ const navSchema = new mongoose.Schema({
 		required: false,
 	},
 }, {
-    collection: 'tb_nav',
+    collection: 'tb_bottomMenu',
     id: false
 });
 
-module.exports = mongoose.model('nav', navSchema);
+module.exports = mongoose.model('bottomMenu', bottomMenuSchema);

@@ -1,5 +1,5 @@
 'use strict';
-var adminModel = require('../models/admin.model.js');
+const adminModel = require('../models/admin.model.js');
 
 exports.find = function(options, callback) {
     var query = {};

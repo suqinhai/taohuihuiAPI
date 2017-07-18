@@ -1,12 +1,12 @@
 'use strict';
-var express = require('express');
-var router = express.Router();
-var co = require('co');
-var fs = require('fs');
-var path = require('path')
-var util = require('../util/util.js');
-var upload = require('../../lib/fileuploads.lib.js');
-var oss = require('../../config/oss.config.js');
+const express = require('express');
+const router = express.Router();
+const co = require('co');
+const fs = require('fs');
+const path = require('path')
+const util = require('../util/util.js');
+const upload = require('../../lib/fileuploads.lib.js');
+const oss = require('../../config/oss.config.js');
 
 router.post('/public/upload',upload.single('file'), function(req, res, next) {
     var file = req.file;
