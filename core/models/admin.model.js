@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
+const adminSchema = new mongoose.Schema({
 	name:{
 		type: String,
 		required: false
@@ -10,8 +10,8 @@ const userSchema = new mongoose.Schema({
 	email:{
 		type: String,
 		required: false
-	}
-	user:{
+	},
+	admin:{
 		type: String,
 		required: true
 	},
@@ -28,8 +28,8 @@ const userSchema = new mongoose.Schema({
 		required: false
 	}
 }, {
-    collection: 'tb_user',
+    collection: 'tb_admin',
     id: false
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Admin', adminSchema);

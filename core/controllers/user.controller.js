@@ -1,7 +1,7 @@
 'use strict';
 const util = require('../util/util.js');
 const userModel = require('../models/user.model.js');
-const userServers = require('../servers/user.servers.js');
+// const userServers = require('../servers/admin.servers.js');
 
 /**
  * 后台注册

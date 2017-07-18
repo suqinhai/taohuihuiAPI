@@ -27,4 +27,4 @@ const bottomMenuSchema = new mongoose.Schema({
     id: false
 });
 
-module.exports = mongoose.model('bottomMenu', bottomMenuSchema);
+module.exports = mongoose.model('BottomMenu', bottomMenuSchema);

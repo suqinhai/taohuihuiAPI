@@ -23,4 +23,4 @@ const navSchema = new mongoose.Schema({
     id: false
 });
 
-module.exports = mongoose.model('nav', navSchema);
+module.exports = mongoose.model('Nav', navSchema);
