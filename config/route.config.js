@@ -4,23 +4,26 @@
  * [exports description]
  * @type {Object}
  */
-module.exports = {
+const project = require('./project.config.js');
+
+
+const routers = {
 
     // 后台用户管理路由
-    '/taohuihui/admin/register': {
+    '/admin/register': {
         'post': 'admin.register'
     },
-    '/taohuihui/admin/login': {
+    '/admin/login': {
         'post': 'admin.login'
     },
-    '/taohuihui/admin/modifyPassWord': {
+    '/admin/modifyPassWord': {
         'post': 'admin.modifyPassWord'
     },
-    '/taohuihui/admin/logout': {
+    '/admin/logout': {
         'get': 'admin.logout'
     },
 
-    // 前台用户管理路由
+    // 后台用户管理路由
     '/user/register': {
         'post': 'user.register'
     },
@@ -35,17 +38,17 @@ module.exports = {
     },
 
 
-    // 首页菜单路由
-    '/taohuihui/nav/get': {
+    // 首页头部菜单
+    '/nav/get': {
         'get': 'nav.get'
     },
-    '/taohuihui/nav/add': {
+    '/nav/add': {
         'post': 'nav.add'
     },
-    '/taohuihui/nav/modify': {
+    '/nav/modify': {
         'post': 'nav.modify'
     },
-    '/taohuihui/nav/del': {
+    '/nav/del': {
         'post': 'nav.del'
     },
 
@@ -79,6 +82,10 @@ module.exports = {
         'post': 'bottomMenu.del'
     },
     
-
-
 }
+
+const rs = {};
+for (var router in routers){
+    rs['/' + project.projectName + router] = routers[router]
+}
+module.exports = rs

@@ -7,7 +7,7 @@ module.exports = {
 	host:'localhost',
 	port: '27017',
 	db: 'db_app_publish',
-	user: '',
+	user: 'root',
 	pass: ''
 }
 

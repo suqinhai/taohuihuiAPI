@@ -5,11 +5,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-
+var project = require('./config/project.config.js');
 var validator = require('./lib/validator.lib.js');
 var viewsMap = require('./lib/views.map.lib.js');
 var routeMap = require('./lib/route.map.lib.js');
-var uploadFile = require('./core/controllers/public.controller.js');
+var publicContr = require('./core/controllers/public.controller.js');
 var app = express();
 
 // view engine setup
@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(validator());
 app.use('/', viewsMap);
 app.use('/', routeMap);
-app.use('/', uploadFile);
+app.use('/' + project , publicContr);
 
 
 // catch 404 and forward to error handler

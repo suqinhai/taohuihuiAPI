@@ -21,10 +21,13 @@ exports.get = function(req, res, next) {
         .limit(pageSize)
         .select('name sort createTime updateTime')
         .lean()
-        .exec(function(err, results) {
+        .exec(function(err, data) {
             res.status(200).json({
                 'code': '1',
-                'data': results
+                'count': data.length,
+                'list': data,
+                'total_page': Math.ceil(data.length / pageSize),
+                'now_page': page
             });
         })
 }
@@ -37,8 +40,8 @@ exports.get = function(req, res, next) {
  * @return   {[type]}
  */
 exports.add = function(req, res, next) {
-    var param = req.query || req.params
-    req.checkQuery({
+    
+    req.checkBody({
         'name': {
             notEmpty: {
                 options: [true],
@@ -61,16 +64,17 @@ exports.add = function(req, res, next) {
         });
     }
 
+    var param = req.body
     var data = {
         'name': param.name,
         'sort': parseInt(param.sort),
         'createTime':util.dataFormat(new Date()),
         'updateTime':util.dataFormat(new Date()),
     };
-    navModel.create(data, function(err, results) {
+    navModel.create(data, function(err, data) {
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': data
         });
     })
 
@@ -84,8 +88,8 @@ exports.add = function(req, res, next) {
  * @return   {[type]}
  */
 exports.modify = function(req, res, next) {
-    var param = req.query || req.params
-    req.checkQuery({
+    
+    req.checkBody({
         '_id': {
             notEmpty: {
                 options: [true],
@@ -113,17 +117,17 @@ exports.modify = function(req, res, next) {
             'data': req.validationErrors()
         });
     }
-
+    var param = req.body
     var _id = param._id
     var data = {
         'name': param.name,
         'sort': parseInt(param.sort),
         'updateTime':util.dataFormat(new Date())
     };
-    navModel.update({ '_id': _id }, data, function(err, results) {
+    navModel.update({ '_id': _id }, data, function(err, data) {
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': data
         });
     })
 }
@@ -136,29 +140,32 @@ exports.modify = function(req, res, next) {
  * @return   {[type]}
  */
 exports.del = function(req, res, next) {
-    var param = req.query || req.params
-    req.checkQuery({
-        '_id': {
-            notEmpty: {
-                options: [true],
-                errorMessage: '_id 不能为空'
-            }
-        }
-    })
-    if (req.validationErrors()) {
-        return res.status(400).json({
-            'code': '0',
-            'data': req.validationErrors()
-        });
-    }
+    
+    // req.checkBody({
+    //     '_ids': {
+    //         notEmpty: {
+    //             options: [true],
+    //             errorMessage: '_ids 不能为空'
+    //         }
+    //     },
+    //     // isNumber:{ errorMessage: 'sort 不是一个number类型'}
+    // })
 
-    var data = {
-        '_id': param._id
-    };
-    navModel.remove(data, function(err, results) {
+    // if (req.validationErrors()) {
+    //     return res.status(400).json({
+    //         'code': '0',
+    //         'data': req.validationErrors()
+    //     });
+    // }
+
+    var param = req.body
+    var _ids = param._ids
+    console.log(req.body)
+
+    navModel.remove({'_id':{$in:_ids}}, function(err, data) {
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': data
         });
     })
 }

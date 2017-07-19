@@ -13,7 +13,7 @@ const adminServers = require('../servers/admin.servers.js');
 
 exports.register = function(req, res, next) {
 
-    req.checkQuery({
+    req.checkBody({
         'name': {
             notEmpty: {
                 options: [true],
@@ -47,7 +47,7 @@ exports.register = function(req, res, next) {
         });
     }
 
-    var param = req.query || req.params
+    var param = req.body
     var data = {
         'name':param.name,
         'email':param.email,
@@ -70,7 +70,6 @@ exports.register = function(req, res, next) {
                 adminModel.create(data,function(err,data){
                     if (err){
                         console.log(err)
-                        res.send('111')
                     }
                     res.status(200).json({
                         'code': '1',
@@ -152,7 +151,7 @@ exports.login = function(req, res, next) {
 
 exports.modifyPassWord = function(req, res, next) {
 
-     req.checkQuery({
+     req.checkBody({
         'name': {
             notEmpty: {
                 options: [true],
@@ -186,7 +185,7 @@ exports.modifyPassWord = function(req, res, next) {
         });
     }
 
-    var param = req.query || req.params
+    var param = req.body
     var _id = param._id
     var user = param.user
     var data = {
