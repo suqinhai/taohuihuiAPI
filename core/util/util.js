@@ -63,13 +63,13 @@ exports.md5File = function(file) {
     var md5File
     var hash = crypto.createHash('md5');
 
-    file.on('data', function(){
-        hash.update.bind(hash)
+    file.on('data', function(chunk){
+        hash.update(chunk)
     });
 
     return new Promise(function(resolve, reject) {
         file.on('end', function () {
-           resolve(hash.digest('hex'));
+           resolve(hash.digest('hex').toUpperCase());
         });
     })
 }

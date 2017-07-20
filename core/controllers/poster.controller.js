@@ -1,5 +1,4 @@
 'use strict';
-const async = require('async')
 const util = require('../util/util.js');
 const posterModel = require('../models/poster.model.js');
 /**
@@ -9,43 +8,34 @@ const posterModel = require('../models/poster.model.js');
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.get = function(req, res, next) {
+exports.get = async function(req, res, next) {
     var param = req.query || req.params
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 15));
     var data = {};
     param.name ? data.name = new RegExp(param.name) : '';
 
-    async.parallel({
-        count: function(fn) {
-            posterModel.count({})
-                .exec(function(err, data) {
-                    err ? res.send(err) : '';
-                    fn(null, data)
-                })
-
-        },
-        query: function(fn) {
-            posterModel.find(data)
-                .skip((page - 1) * pageSize)
-                .limit(pageSize)
-                .select('title url sort alt createTime updateTime')
-                .lean()
-                .exec(function(err, data) {
-                    err ? res.send(err) : '';
-                    fn(null, data)
-                })
-
-        }
-    }, function(err, result) {
-        res.status(200).json({
-            'code': '1',
-            'count': result.count,
-            'list': result.query,
-            'total_page': Math.ceil(result.count / pageSize),
-            'now_page': page
+    var count = await posterModel.count({})
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
         });
-    });
+
+    posterModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('title url img sort alt createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        });
 }
 
 /**
@@ -62,6 +52,18 @@ exports.add = function(req, res, next) {
             notEmpty: {
                 options: [true],
                 errorMessage: 'url 不能为空'
+            }
+        },
+        'img': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'img 不能为空'
+            }
+        },
+        'title': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'title 不能为空'
             }
         },
         'sort': {
@@ -84,11 +86,14 @@ exports.add = function(req, res, next) {
     var data = {
         'url': param.url,
         'sort': parseInt(param.sort),
+        'img': param.img,
         'title': param.title,
         'alt': param.alt,
         'createTime': util.dataFormat(new Date()),
         'updateTime': util.dataFormat(new Date()),
     };
+
+   
 
     posterModel.create(data, function(err, results) {
         err ? res.send(err) : '';
@@ -122,6 +127,18 @@ exports.modify = function(req, res, next) {
                 errorMessage: 'title 不能为空'
             }
         },
+        'img': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'img 不能为空'
+            }
+        },
+        'url': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'url 不能为空'
+            }
+        },
         'sort': {
             notEmpty: {
                 options: [true],
@@ -142,6 +159,7 @@ exports.modify = function(req, res, next) {
     var _id = param._id
     var data = {
         'url': param.url,
+        'img': param.img,
         'sort': parseInt(param.sort),
         'title': param.title,
         'alt': param.alt,

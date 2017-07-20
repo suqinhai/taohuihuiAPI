@@ -234,9 +234,6 @@ function core(casper, num, callback2) {
                 params[d] = data[d]
               }
 
-
-
-
               cb(null, params)
             })
 

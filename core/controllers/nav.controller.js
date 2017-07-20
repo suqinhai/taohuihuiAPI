@@ -1,5 +1,4 @@
 'use strict';
-const async = require('async')
 const util = require('../util/util.js');
 const navModel = require('../models/nav.model.js');
 
@@ -10,43 +9,37 @@ const navModel = require('../models/nav.model.js');
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.get = function(req, res, next) {
+exports.get = async function(req, res, next) {
     var param = req.query || req.params
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 15));
     var data = {};
     param.name ? data.name = new RegExp(param.name) : '';
 
-    async.parallel({
-        count: function(fn) {
-            navModel.count({})
-                .exec(function(err, data) {
-                    err ? res.send(err) : '';
-                    fn(null, data)
-                })
+    var count = await navModel.count({})
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
 
-        },
-        query: function(fn) {
-            navModel.find(data)
-                .skip((page - 1) * pageSize)
-                .limit(pageSize)
-                .select('name sort createTime updateTime')
-                .lean()
-                .exec(function(err, data) {
-                    err ? res.send(err) : '';
-                    fn(null, data)
-                })
+    navModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('name sort createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
 
-        }
-    }, function(err, result) {
-        res.status(200).json({
-            'code': '1',
-            'count': result.count,
-            'list': result.query,
-            'total_page': Math.ceil(result.count / pageSize),
-            'now_page': page
-        });
-    });
+
+
 }
 
 /**

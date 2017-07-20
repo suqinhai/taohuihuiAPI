@@ -1,5 +1,4 @@
 'use strict';
-const async = require('async');
 const util = require('../util/util.js');
 const bottomMenuModel = require('../models/bottomMenu.model.js');
 
@@ -10,44 +9,35 @@ const bottomMenuModel = require('../models/bottomMenu.model.js');
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.get = function(req, res, next) {
+exports.get = async function(req, res, next) {
     var param = req.query || req.params
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
     var data = {};
     param.name ? data.name = new RegExp(param.name) : '';
 
+    var count = await bottomMenuModel.count({})
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
 
-    async.parallel({
-        count: function(fn) {
-            bottomMenuModel.count({})
-                .exec(function(err, data) {
-                    err ? res.send(err) : '';
-                    fn(null, data)
-                })
+    bottomMenuModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('name url sort createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
 
-        },
-        query: function(fn) {
-            bottomMenuModel.find(data)
-                .skip((page - 1) * pageSize)
-                .limit(pageSize)
-                .select('name url sort createTime updateTime')
-                .lean()
-                .exec(function(err, data) {
-                    err ? res.send(err) : '';
-                    fn(null, data)
-                })
-        }
-    }, function(err, result) {
-        err ? res.send(err) : '';
-        res.status(200).json({
-            'code': '1',
-            'count': result.count,
-            'list': result.query,
-            'total_page': Math.ceil(result.count / pageSize),
-            'now_page': page
-        });
-    });
 }
 
 /**
@@ -159,6 +149,7 @@ exports.modify = function(req, res, next) {
         'sort': parseInt(param.sort),
         'updateTime': util.dataFormat(new Date())
     };
+
     bottomMenuModel.update({ '_id': _id }, data, function(err, results) {
         err ? res.send(err) : '';
         res.status(200).json({
