@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(validator());
 app.use('/', viewsMap);
 app.use('/', routeMap);
-app.use('/' + project , publicContr);
+app.use('/' + project.projectName , publicContr);
 
 
 // catch 404 and forward to error handler

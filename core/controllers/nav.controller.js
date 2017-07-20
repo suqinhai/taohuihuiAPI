@@ -1,4 +1,5 @@
 'use strict';
+const async = require('async')
 const util = require('../util/util.js');
 const navModel = require('../models/nav.model.js');
 
@@ -12,24 +13,40 @@ const navModel = require('../models/nav.model.js');
 exports.get = function(req, res, next) {
     var param = req.query || req.params
     var page = parseInt((param.page ? param.page : 1));
-    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 15));
     var data = {};
     param.name ? data.name = new RegExp(param.name) : '';
 
-    navModel.find(data)
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .select('name sort createTime updateTime')
-        .lean()
-        .exec(function(err, data) {
-            res.status(200).json({
-                'code': '1',
-                'count': data.length,
-                'list': data,
-                'total_page': Math.ceil(data.length / pageSize),
-                'now_page': page
-            });
-        })
+    async.parallel({
+        count: function(fn) {
+            navModel.count({})
+                .exec(function(err, data) {
+                    err ? res.send(err) : '';
+                    fn(null, data)
+                })
+
+        },
+        query: function(fn) {
+            navModel.find(data)
+                .skip((page - 1) * pageSize)
+                .limit(pageSize)
+                .select('name sort createTime updateTime')
+                .lean()
+                .exec(function(err, data) {
+                    err ? res.send(err) : '';
+                    fn(null, data)
+                })
+
+        }
+    }, function(err, result) {
+        res.status(200).json({
+            'code': '1',
+            'count': result.count,
+            'list': result.query,
+            'total_page': Math.ceil(result.count / pageSize),
+            'now_page': page
+        });
+    });
 }
 
 /**
@@ -40,7 +57,7 @@ exports.get = function(req, res, next) {
  * @return   {[type]}
  */
 exports.add = function(req, res, next) {
-    
+
     req.checkBody({
         'name': {
             notEmpty: {
@@ -53,7 +70,7 @@ exports.add = function(req, res, next) {
                 options: [true],
                 errorMessage: 'sort 不能为空'
             },
-            isNumber:{ errorMessage: 'sort 不是一个number类型'}
+            isNumber: { errorMessage: 'sort 需为number类型' }
         }
     })
 
@@ -68,10 +85,11 @@ exports.add = function(req, res, next) {
     var data = {
         'name': param.name,
         'sort': parseInt(param.sort),
-        'createTime':util.dataFormat(new Date()),
-        'updateTime':util.dataFormat(new Date()),
+        'createTime': util.dataFormat(new Date()),
+        'updateTime': util.dataFormat(new Date()),
     };
     navModel.create(data, function(err, data) {
+        err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
             'data': data
@@ -88,7 +106,7 @@ exports.add = function(req, res, next) {
  * @return   {[type]}
  */
 exports.modify = function(req, res, next) {
-    
+
     req.checkBody({
         '_id': {
             notEmpty: {
@@ -107,7 +125,7 @@ exports.modify = function(req, res, next) {
                 options: [true],
                 errorMessage: 'sort 不能为空'
             },
-            isNumber:{ errorMessage: 'sort 不是一个number类型'}
+            isNumber: { errorMessage: 'sort 需为number类型' }
         }
     })
 
@@ -122,9 +140,10 @@ exports.modify = function(req, res, next) {
     var data = {
         'name': param.name,
         'sort': parseInt(param.sort),
-        'updateTime':util.dataFormat(new Date())
+        'updateTime': util.dataFormat(new Date())
     };
     navModel.update({ '_id': _id }, data, function(err, data) {
+        err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
             'data': data
@@ -140,38 +159,37 @@ exports.modify = function(req, res, next) {
  * @return   {[type]}
  */
 exports.del = function(req, res, next) {
-    
-    // req.checkBody({
-    //     '_ids': {
-    //         notEmpty: {
-    //             options: [true],
-    //             errorMessage: '_ids 不能为空'
-    //         }
-    //     },
-    //     // isNumber:{ errorMessage: 'sort 不是一个number类型'}
-    // })
 
-    // if (req.validationErrors()) {
-    //     return res.status(400).json({
-    //         'code': '0',
-    //         'data': req.validationErrors()
-    //     });
-    // }
+    req.checkBody({
+        '_ids': {
+            notEmpty: {
+                options: [true],
+                errorMessage: '_ids 不能为空'
+            },
+            isArray: { errorMessage: '_ids 需为数组' }
+        },
+
+    })
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
 
     var param = req.body
-    var _ids = param._ids
-    console.log(req.body)
 
-    navModel.remove({'_id':{$in:_ids}}, function(err, data) {
-        res.status(200).json({
-            'code': '1',
-            'data': data
-        });
-    })
+    var data = {
+        '_id': { $in: param._ids }
+    }
+
+    navModel.remove(data)
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'data': data
+            });
+        })
 }
-
-
-
-
-
-
