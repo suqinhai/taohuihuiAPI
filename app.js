@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var project = require('./config/project.config.js');
+// var email = require('./lib/email.lib.js');
 var validator = require('./lib/validator.lib.js');
 var viewsMap = require('./lib/views.map.lib.js');
 var routeMap = require('./lib/route.map.lib.js');
