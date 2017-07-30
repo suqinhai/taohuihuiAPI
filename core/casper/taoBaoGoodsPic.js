@@ -12,7 +12,7 @@ var casper = require('casper').create({
     '../includes/jquery.js' // These two scripts will be injected in remote
   ],
   pageSettings: {
-    loadImages: true, // The WebPage instance used by Casper will
+    loadImages: false, // The WebPage instance used by Casper will
     loadPlugins: false, // use these settings
   },
   logLevel: "info", // Only "info" level messages will be logged

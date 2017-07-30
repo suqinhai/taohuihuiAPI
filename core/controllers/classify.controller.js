@@ -1,9 +1,9 @@
 'use strict';
 const util = require('../util/util.js');
-const navModel = require('../models/nav.model.js');
+const classifyModel = require('../models/classify.model.js');
 
 /**
- * 获取首页导航列表
+ * 获取分类
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -12,21 +12,20 @@ const navModel = require('../models/nav.model.js');
 exports.get = async function(req, res, next) {
     var param = req.query || req.params
     var page = parseInt((param.page ? param.page : 1));
-    var pageSize = parseInt((param.pageSize ? param.pageSize : 15));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
     var data = {};
     param.name ? data.name = new RegExp(param.name) : '';
 
-    var count = await navModel.count({})
+    var count = await classifyModel.count({})
         .exec(function(err, count) {
             err ? res.send(err) : '';
             return count
         })
 
-    navModel.find(data)
+    classifyModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .sort({'sort':-1}) // -1 降序 1 升序 
-        .select('name sort url createTime updateTime')
+        .select('name url sort createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -39,12 +38,10 @@ exports.get = async function(req, res, next) {
             });
         })
 
-
-
 }
 
 /**
- * 添加首页导航列表
+ * 添加分类
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -89,18 +86,19 @@ exports.add = function(req, res, next) {
         'createTime': util.dataFormat(new Date()),
         'updateTime': util.dataFormat(new Date()),
     };
-    navModel.create(data, function(err, data) {
+
+    classifyModel.create(data, function(err, results) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': data
+            'data': results
         });
     })
 
 }
 
 /**
- * 修改首页导航列表
+ * 修改分类
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -142,6 +140,7 @@ exports.modify = function(req, res, next) {
             'data': req.validationErrors()
         });
     }
+
     var param = req.body
     var _id = param._id
     var data = {
@@ -150,17 +149,18 @@ exports.modify = function(req, res, next) {
         'sort': parseInt(param.sort),
         'updateTime': util.dataFormat(new Date())
     };
-    navModel.update({ '_id': _id }, data, function(err, data) {
+
+    classifyModel.update({ '_id': _id }, data, function(err, results) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': data
+            'data': results
         });
     })
 }
 
 /**
- * 删除首页导航列表
+ * 删除分类
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
@@ -192,7 +192,7 @@ exports.del = function(req, res, next) {
         '_id': { $in: param._ids }
     }
 
-    navModel.remove(data)
+    classifyModel.remove(data)
         .exec(function(err, data) {
             err ? res.send(err) : '';
             res.status(200).json({
@@ -201,3 +201,7 @@ exports.del = function(req, res, next) {
             });
         })
 }
+
+
+
+

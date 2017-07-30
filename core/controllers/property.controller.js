@@ -1,32 +1,52 @@
 'use strict';
 const util = require('../util/util.js');
-const navModel = require('../models/nav.model.js');
+const propertyModel = require('../models/property.model.js');
+
 
 /**
- * 获取首页导航列表
+ * 获取属性
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.get = async function(req, res, next) {
-    var param = req.query || req.params
+exports.getProperty = async function(req, res, next) {
+    var param = req.query
     var page = parseInt((param.page ? param.page : 1));
-    var pageSize = parseInt((param.pageSize ? param.pageSize : 15));
-    var data = {};
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+    
+    req.checkQuery({
+        'classifyId': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'classifyId 不能为空'
+            }
+        }
+    })
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
+
+    var data = {
+        'classifyId':param.classifyId
+    };
+
     param.name ? data.name = new RegExp(param.name) : '';
 
-    var count = await navModel.count({})
+    var count = await propertyModel.count(data)
         .exec(function(err, count) {
             err ? res.send(err) : '';
             return count
         })
 
-    navModel.find(data)
+    propertyModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .sort({'sort':-1}) // -1 降序 1 升序 
-        .select('name sort url createTime updateTime')
+        .select('name url sort createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -39,20 +59,24 @@ exports.get = async function(req, res, next) {
             });
         })
 
-
-
 }
 
 /**
- * 添加首页导航列表
+ * 添加属性
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.add = function(req, res, next) {
+exports.addProperty = function(req, res, next) {
 
     req.checkBody({
+        'classifyId': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'classifyId 不能为空'
+            }
+        },
         'name': {
             notEmpty: {
                 options: [true],
@@ -86,27 +110,29 @@ exports.add = function(req, res, next) {
         'name': param.name,
         'url': param.url,
         'sort': parseInt(param.sort),
+        'classifyId':param.classifyId,
         'createTime': util.dataFormat(new Date()),
         'updateTime': util.dataFormat(new Date()),
     };
-    navModel.create(data, function(err, data) {
+
+    propertyModel.create(data, function(err, results) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': data
+            'data': results
         });
     })
 
 }
 
 /**
- * 修改首页导航列表
+ * 修改属性
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.modify = function(req, res, next) {
+exports.modifyProperty = function(req, res, next) {
 
     req.checkBody({
         '_id': {
@@ -142,6 +168,7 @@ exports.modify = function(req, res, next) {
             'data': req.validationErrors()
         });
     }
+
     var param = req.body
     var _id = param._id
     var data = {
@@ -150,23 +177,24 @@ exports.modify = function(req, res, next) {
         'sort': parseInt(param.sort),
         'updateTime': util.dataFormat(new Date())
     };
-    navModel.update({ '_id': _id }, data, function(err, data) {
+
+    propertyModel.update({ '_id': _id }, data, function(err, results) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': data
+            'data': results
         });
     })
 }
 
 /**
- * 删除首页导航列表
+ * 删除属性
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.del = function(req, res, next) {
+exports.delProperty = function(req, res, next) {
 
     req.checkBody({
         '_ids': {
@@ -192,7 +220,7 @@ exports.del = function(req, res, next) {
         '_id': { $in: param._ids }
     }
 
-    navModel.remove(data)
+    propertyModel.remove(data)
         .exec(function(err, data) {
             err ? res.send(err) : '';
             res.status(200).json({

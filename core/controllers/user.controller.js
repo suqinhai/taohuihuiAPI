@@ -3,6 +3,46 @@ const util = require('../util/util.js');
 const userModel = require('../models/user.model.js');
 // const userServers = require('../servers/admin.servers.js');
 
+
+
+/**
+ * 获取用户列表
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.get = async function(req, res, next) {
+    var param = req.query || req.params
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+    var data = {};
+    param.name ? data.name = new RegExp(param.name) : '';
+
+    var count = await userModel.count({})
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
+
+    userModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('user name email user createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
+
+}
+
 /**
  * 后台注册
  * @Author   suqinhai
@@ -11,9 +51,9 @@ const userModel = require('../models/user.model.js');
  * @return   {[type]}
  */
 
-exports.register = function(req, res, next) {
+exports.add = function(req, res, next) {
 
-    req.checkQuery({
+    req.checkBody({
         'name': {
             notEmpty: {
                 options: [true],
@@ -32,10 +72,10 @@ exports.register = function(req, res, next) {
                 errorMessage: 'user 不能为空'
             }
         },
-        'passwd': {
+        'newPasswd': {
             notEmpty: {
                 options: [true],
-                errorMessage: 'passwd 不能为空'
+                errorMessage: 'newPasswd 不能为空'
             }
         },
     })
@@ -47,15 +87,14 @@ exports.register = function(req, res, next) {
         });
     }
 
-    var param = req.query || req.params
-
+    var param = req.body
     var data = {
         'name':param.name,
         'email':param.email,
         'user':param.user,
-        'passwd':param.passwd,
+        'passwd':param.newPasswd,
         'createTime':util.dataFormat(new Date()),
-        'updateTime':util.dataFormat(new Date()),
+        'updateTime':util.dataFormat(new Date())
     }
 
     /*判断有没有这个用户*/
@@ -68,77 +107,16 @@ exports.register = function(req, res, next) {
                 });
             } else {
                 /*新增用户*/
-                userModel.create(data);
-                res.status(200).json({
-                    'code': '1',
-                    'msg': '新增用户成功！'
-                });
-            }
-        });
-}
-
-/**
- *
- * 后台用户登录
- * @Author   suqinhai
- * @DateTime 2017-07-16
- * @QQ       467456744
- * @return   {[type]}
- */
-
-exports.login = function(req, res, next) {
-
-    req.checkQuery({
-        'user': {
-            notEmpty: {
-                options: [true],
-                errorMessage: 'user 不能为空'
-            }
-        },
-        'passwd': {
-            notEmpty: {
-                options: [true],
-                errorMessage: 'passwd 不能为空'
-            }
-        },
-    })
-
-    if (req.validationErrors()) {
-        return res.status(400).json({
-            'code': '0',
-            'data': req.validationErrors()
-        });
-    }
-
-    var param = req.query || req.params
-    var data = {
-        user:param.user,
-        passwd:param.passwd,
-    }
-
-
-    /*已登陆判断*/
-    if (req.session.id) {
-        res.status(200).send('用户已登陆！');
-        return false;
-    }
-
-    /*登陆判断*/
-    userModel.findOne(data)
-        .then(function(result) {
-
-            req.session.userId = result.id;
-
-            if (result) {
-                res.status(200).json({
-                    'code': '1',
-                    'msg': '登陆成功！'
-                });
-            } else {
-                res.status(200).json({
-                    'code': '1',
-                    'msg': '登陆失败！'
-                });
+                userModel.create(data,function(err,data){
+                    if (err){
+                        console.log(err)
+                    }
+                    res.status(200).json({
+                        'code': '1',
+                        'msg': '新增用户成功！'
+                    });
+                })
+                
             }
         });
 }
@@ -151,9 +129,9 @@ exports.login = function(req, res, next) {
  * @return   {[type]}
  */
 
-exports.modifyPassWord = function(req, res, next) {
+exports.modify = function(req, res, next) {
 
-     req.checkQuery({
+     req.checkBody({
         'name': {
             notEmpty: {
                 options: [true],
@@ -166,6 +144,116 @@ exports.modifyPassWord = function(req, res, next) {
                 errorMessage: 'email 不能为空'
             }
         },
+        'newPasswd':{
+            notEmpty: {
+                options: [true],
+                errorMessage: 'newPasswd 不能为空'
+            }
+        },
+    })
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
+
+    var param = req.body
+    var _id = param._id
+
+    var data = {
+        'name':param.name,
+        'email':param.email,
+        'updateTime':util.dataFormat(new Date()),
+    }
+
+    /*判断有没有这个用户*/
+    userModel.findOne({ '_id':_id,'passwd':param.passwd})
+        .then(function(result) {
+            if ( !result ) {
+                res.status(200).json({
+                    'code': '0',
+                    'msg': '密码错误！'
+                });
+            } else {
+                data.passwd = param.newPasswd
+                /* 更新密码*/
+                userModel.update({'_id':_id}, data , function(result) {
+                        if (result) {
+                            res.status(200).json({
+                                'code': '1',
+                                'msg': '修改成功！'
+                            });
+                        } else {
+                            res.status(200).json({
+                                'code': '1',
+                                'msg': '修改失败！'
+                            });
+                        }
+                });
+            }
+
+        });
+}
+
+/**
+ * 删除用户
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.del = function(req, res, next) {
+
+    req.checkBody({
+        '_ids': {
+            notEmpty: {
+                options: [true],
+                errorMessage: '_ids 不能为空'
+            },
+            isArray: { errorMessage: '_ids 需为数组' }
+        },
+
+    })
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
+
+    var param = req.body
+
+    var data = {
+        '_id': { $in: param._ids }
+    }
+
+    userModel.remove(data)
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'data': data
+            });
+        })
+}
+
+
+
+/**
+ *
+ * 后台用户登录
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+
+exports.login = function(req, res, next) {
+
+    req.checkBody({
         'user': {
             notEmpty: {
                 options: [true],
@@ -187,44 +275,34 @@ exports.modifyPassWord = function(req, res, next) {
         });
     }
 
-    var param = req.query || req.params
-    var _id = param._id
-    var user = param.user
+    var param = req.body
     var data = {
-        'name':param.name,
-        'email':param.email,
-        'passwd':param.passwd,
-        'updateTime':util.dataFormat(new Date()),
+        user:param.user,
+        passwd:param.passwd,
     }
 
-    /*判断有没有这个用户*/
-    userModel.findOne({ 'user':user })
-        .then(function(result) {
-            if (!result) {
+    /*登陆判断*/
+    userModel.findOne(data)
+        .select('name user email createTime updateTime')
+        .lean()
+        .exec(function(err, result) {
+            if (result) {
+                req.session.userId = result._id;
                 res.status(200).json({
                     'code': '1',
-                    'msg': '不存在该用户！'
+                    'msg': '登陆成功！',
+                    'data':result
                 });
             } else {
-
-                /* 更新密码*/
-                userModel.update({'user':user,'_id':_id}, data , function(result) {
-                        if (result) {
-                            res.status(200).json({
-                                'code': '1',
-                                'msg': '修改成功！'
-                            });
-                        } else {
-                            res.status(200).json({
-                                'code': '1',
-                                'msg': '修改失败！'
-                            });
-                        }
-                    });
+                res.status(200).json({
+                    'code': '0',
+                    'msg': '账号或密码错误！'
+                });
             }
-
         });
 }
+
+
 
 
 /**

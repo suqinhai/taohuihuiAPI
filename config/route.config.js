@@ -10,31 +10,43 @@ const project = require('./project.config.js');
 const routers = {
 
     // 后台用户管理路由
-    '/admin/register': {
-        'post': 'admin.register'
+    '/admin/get': {
+        'get': 'admin.get'
+    },
+    '/admin/add': {
+        'post': 'admin.add'
+    },
+    '/admin/modify': {
+        'post': 'admin.modify'
+    },
+    '/admin/del': {
+        'post': 'admin.del'
     },
     '/admin/login': {
         'post': 'admin.login'
-    },
-    '/admin/modifyPassWord': {
-        'post': 'admin.modifyPassWord'
     },
     '/admin/logout': {
         'get': 'admin.logout'
     },
 
-    // 后台用户管理路由
-    '/user/register': {
-        'post': 'user.register'
+    // 前台用户管理路由
+    '/user/get': {
+        'get': 'user.get'
+    },
+    '/user/add': {
+        'post': 'user.add'
+    },
+    '/user/modify': {
+        'post': 'user.modify'
+    },
+    '/user/del': {
+        'post': 'user.del'
     },
     '/user/login': {
-        'get': 'user.login'
-    },
-    '/user/modifyPassWord': {
-        'post': 'user.modifyPassWord'
+        'post': 'user.login'
     },
     '/user/logout': {
-        'post': 'user.logout'
+        'get': 'user.logout'
     },
 
 
@@ -81,7 +93,54 @@ const routers = {
     '/bottomMenu/del': {
         'post': 'bottomMenu.del'
     },
-    
+
+
+    // 分类管理接口
+    '/classify/get': {
+        'get': 'classify.get'
+    },
+    '/classify/add': {
+        'post': 'classify.add'
+    },
+    '/classify/modify': {
+        'post': 'classify.modify'
+    },
+    '/classify/del': {
+        'post': 'classify.del'
+    },
+
+    // 分类属性管理接口
+    '/property/getProperty': {
+        'get': 'property.getProperty'
+    },
+    '/property/addProperty': {
+        'post': 'property.addProperty'
+    },
+    '/property/modifyProperty': {
+        'post': 'property.modifyProperty'
+    },
+    '/property/delProperty': {
+        'post': 'property.delProperty'
+    },
+
+
+     // 商品管理接口
+    '/goods/get': {
+        'get': 'goods.get'
+    },
+    '/goods/status': {
+        'post': 'goods.status'
+    },
+    '/goods/modify': {
+        'post': 'goods.modify'
+    },
+    '/goods/del': {
+        'post': 'goods.del'
+    },
+    // 首页底部浮动菜单
+     '/goods/getDetails': {
+        'get': 'goods.getDetails'
+    },
 }
 
 const rs = {};

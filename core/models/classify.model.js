@@ -1,7 +1,7 @@
 'use strict';
 const mongoose = require('mongoose');
 
-const navSchema = new mongoose.Schema({
+const classifySchema = new mongoose.Schema({
 	'name':{
 		type: String,
 		required: true
@@ -14,6 +14,11 @@ const navSchema = new mongoose.Schema({
 		type: Number,
 		required: true
 	},
+	'propertyId':[{
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Property',
+		required: true
+	}],
 	'createTime':{
 		type: String,
 		required: false,
@@ -23,8 +28,8 @@ const navSchema = new mongoose.Schema({
 		required: false,
 	},
 }, {
-    collection: 'tb_nav',
+    collection: 'tb_classify',
     id: false
 });
 
-module.exports = mongoose.model('Nav', navSchema);
+module.exports = mongoose.model('Classify', classifySchema);
