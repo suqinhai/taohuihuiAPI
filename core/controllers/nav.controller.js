@@ -2,6 +2,48 @@
 const util = require('../util/util.js');
 const navModel = require('../models/nav.model.js');
 
+
+/**
+ * 获取前台首页导航列表
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.getNav = async function(req, res, next) {
+    var param = req.query || req.params
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 15));
+    var data = {};
+    param.name ? data.name = new RegExp(param.name) : '';
+
+    var count = await navModel.count({})
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
+
+    navModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .sort({'sort':-1}) // -1 降序 1 升序 
+        .select('name sort url createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
+
+
+}
+
+
 /**
  * 获取首页导航列表
  * @Author   suqinhai
@@ -40,8 +82,8 @@ exports.get = async function(req, res, next) {
         })
 
 
-
 }
+
 
 /**
  * 添加首页导航列表

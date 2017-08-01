@@ -137,10 +137,33 @@ const routers = {
     '/goods/del': {
         'post': 'goods.del'
     },
-    // 首页底部浮动菜单
-     '/goods/getDetails': {
+
+
+
+    /*
+        前台接口
+     */
+    '/frontend/goods/getDetails': {
         'get': 'goods.getDetails'
     },
+    '/frontend/goods/getItem': {
+        'get': 'goods.getItem'
+    },
+    '/frontend/nav/getNav': {
+        'get': 'nav.getNav'
+    },
+    '/frontend/bottomMenu/getMenu': {
+        'get': 'bottomMenu.getMenu'
+    },
+    '/frontend/poster/getPoster': {
+        'get': 'poster.getPoster'
+    },
+
+    
+
+    
+
+    
 }
 
 const rs = {};

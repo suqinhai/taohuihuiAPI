@@ -1,6 +1,45 @@
 'use strict';
 const util = require('../util/util.js');
 const posterModel = require('../models/poster.model.js');
+
+
+/**
+ * 获取前台首页轮播
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.getPoster = async function(req, res, next) {
+    var param = req.query || req.params
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 15));
+    var data = {};
+    param.name ? data.name = new RegExp(param.name) : '';
+
+    var count = await posterModel.count({})
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        });
+
+    posterModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('title url img sort alt createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        });
+}
+
 /**
  * 获取首页轮播
  * @Author   suqinhai
