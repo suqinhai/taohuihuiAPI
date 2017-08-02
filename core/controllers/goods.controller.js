@@ -13,6 +13,16 @@ exports.get = async function(req, res, next) {
     var param = req.query
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+    
+    if ( param.publish === 0 || param.publish === '0') {
+    var data = {
+        'publish':{$in:['',0]}
+    };
+    }else if ( param.publish == 1 ) {
+        var data = {
+            'publish': param.publish
+        };
+    }
 
     param.name ? data.name = new RegExp(param.name) : '';
 

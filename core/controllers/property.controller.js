@@ -219,7 +219,7 @@ exports.delProperty = function(req, res, next) {
     var data = {
         '_id': { $in: param._ids }
     }
-
+    console.log()
     propertyModel.remove(data)
         .exec(function(err, data) {
             err ? res.send(err) : '';
