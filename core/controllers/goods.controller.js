@@ -14,6 +14,10 @@ exports.get = async function(req, res, next) {
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
 
+    var data = {
+        'publish': param.publish // 0 未发布  1 发布
+    };
+
     param.name ? data.name = new RegExp(param.name) : '';
 
     var count = await goodsModel.count(data)
