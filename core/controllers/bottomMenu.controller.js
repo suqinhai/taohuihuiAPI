@@ -27,7 +27,7 @@ exports.getMenu = async function(req, res, next) {
     bottomMenuModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('name url sort createTime updateTime')
+        .select('name url sort actionType createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -65,7 +65,7 @@ exports.get = async function(req, res, next) {
     bottomMenuModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('name url sort createTime updateTime')
+        .select('name url sort actionType createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -102,6 +102,12 @@ exports.add = function(req, res, next) {
                 errorMessage: 'url 不能为空'
             }
         },
+        'actionType': {  
+            notEmpty: {
+                options: [true],
+                errorMessage: 'url 不能为空'
+            }
+        },
         'sort': {
             notEmpty: {
                 options: [true],
@@ -122,6 +128,7 @@ exports.add = function(req, res, next) {
     var data = {
         'name': param.name,
         'url': param.url,
+        'actionType': param.actionType,
         'sort': parseInt(param.sort),
         'createTime': util.dataFormat(new Date()),
         'updateTime': util.dataFormat(new Date()),
@@ -165,6 +172,12 @@ exports.modify = function(req, res, next) {
                 errorMessage: 'url 不能为空'
             }
         },
+        'actionType': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'url 不能为空'
+            }
+        },
         'sort': {
             notEmpty: {
                 options: [true],
@@ -186,6 +199,7 @@ exports.modify = function(req, res, next) {
     var data = {
         'name': param.name,
         'url': param.url,
+        'actionType': param.actionType,
         'sort': parseInt(param.sort),
         'updateTime': util.dataFormat(new Date())
     };

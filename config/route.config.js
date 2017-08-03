@@ -158,6 +158,13 @@ const routers = {
     '/frontend/poster/getPoster': {
         'get': 'poster.getPoster'
     },
+    '/frontend/classify/getClassify': {
+        'get': 'classify.getClassify'
+    },
+    '/frontend/property/getProperty': {
+        'get': 'property.getProperty'
+    },
+    
 
     
 

@@ -2,6 +2,46 @@
 const util = require('../util/util.js');
 const classifyModel = require('../models/classify.model.js');
 
+
+
+/**
+ * 获取前台分类
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.getClassify = async function(req, res, next) {
+    var param = req.query || req.params
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+    var data = {};
+    param.name ? data.name = new RegExp(param.name) : '';
+
+    var count = await classifyModel.count({})
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
+
+    classifyModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('name url sort createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
+
+}
+
 /**
  * 获取分类
  * @Author   suqinhai
