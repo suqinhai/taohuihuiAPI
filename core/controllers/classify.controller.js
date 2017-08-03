@@ -1,7 +1,8 @@
 'use strict';
+const _ = require('lodash');
 const util = require('../util/util.js');
 const classifyModel = require('../models/classify.model.js');
-
+const thirdPropertyModel = require('../models/thirdProperty.model.js');
 
 
 /**
@@ -27,7 +28,7 @@ exports.getClassify = async function(req, res, next) {
     classifyModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('name url sort createTime updateTime')
+        .select('name url sort publish thirdPropertyIds thirdPropertyNames createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -41,6 +42,8 @@ exports.getClassify = async function(req, res, next) {
         })
 
 }
+
+
 
 /**
  * 获取分类
@@ -65,7 +68,7 @@ exports.get = async function(req, res, next) {
     classifyModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('name url sort createTime updateTime')
+        .select('name url sort publish thirdPropertyIds thirdPropertyNames createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -87,7 +90,370 @@ exports.get = async function(req, res, next) {
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.add = function(req, res, next) {
+exports.add = async function(req, res, next) {
+
+    req.checkBody({
+        'name': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'name 不能为空'
+            }
+        },
+        'url': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'url 不能为空'
+            }
+        },
+        'sort': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'sort 不能为空'
+            },
+            isNumber: { errorMessage: 'sort 需为number类型' }
+        },
+        'thirdPropertyIds': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'thirdPropertyIds 不能为空'
+            },
+            isArray: { errorMessage: 'thirdPropertyIds 需为Array类型' }
+        },
+    })
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
+
+    var param = req.body;
+    var thirdPropertyNames = await thirdPropertyModel.find({ '_id': { $in: param.thirdPropertyIds } });
+
+    param.thirdPropertyNames = _.chain(thirdPropertyNames).map(function(chr) {
+        return chr.name;
+    });
+
+    var data = {
+        'name': param.name,
+        'url': param.url,
+        'sort': parseInt(param.sort),
+        'thirdPropertyIds': param.thirdPropertyIds,
+        'thirdPropertyNames': param.thirdPropertyNames,
+        'createTime': util.dataFormat(new Date()),
+        'updateTime': util.dataFormat(new Date()),
+    };
+
+    classifyModel.create(data, function(err, results) {
+        err ? res.send(err) : '';
+        res.status(200).json({
+            'code': '1',
+            'data': 'ok'
+        });
+    })
+
+}
+
+/**
+ * 修改分类
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.modify = async function(req, res, next) {
+
+    req.checkBody({
+        '_id': {
+            notEmpty: {
+                options: [true],
+                errorMessage: '_id 不能为空'
+            }
+        },
+        'name': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'name 不能为空'
+            }
+        },
+        'url': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'url 不能为空'
+            }
+        },
+        'sort': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'sort 不能为空'
+            },
+            isNumber: { errorMessage: 'sort 需为number类型' }
+        },
+        'thirdPropertyIds': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'sort 不能为空'
+            },
+            isArray: { errorMessage: 'sort 需为Array类型' }
+        },
+    })
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
+
+    var param = req.body;
+    var _id = param._id;
+    var thirdPropertyNames = await thirdPropertyModel.find({ '_id': { $in: param.thirdPropertyIds } });
+
+    param.thirdPropertyNames = _.chain(thirdPropertyNames).map(function(chr) {
+        return chr.name;
+    });
+
+    var data = {
+        'name': param.name,
+        'url': param.url,
+        'sort': parseInt(param.sort),
+        'thirdPropertyIds': param.thirdPropertyIds,
+        'thirdPropertyNames': param.thirdPropertyNames,
+        'updateTime': util.dataFormat(new Date())
+    };
+
+    classifyModel.update({ '_id': _id }, data, function(err, results) {
+        err ? res.send(err) : '';
+        res.status(200).json({
+            'code': '1',
+            'msg': 'ok'
+        });
+    })
+}
+
+/**
+ * 删除分类
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.del = function(req, res, next) {
+
+    req.checkBody({
+        '_ids': {
+            notEmpty: {
+                options: [true],
+                errorMessage: '_ids 不能为空'
+            },
+            isArray: { errorMessage: '_ids 需为数组' }
+        },
+
+    })
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
+
+    var param = req.body
+
+    var data = {
+        '_id': { $in: param._ids }
+    }
+
+    classifyModel.remove(data)
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'msg': 'ok'
+            });
+        })
+}
+
+/**
+ *  上线分类
+ * 
+ * @Author   suqinhai
+ * @DateTime 2017-08-03
+ * @QQ       467456744
+ * @return   {[type]}        [description]
+ */
+exports.upClassify = async function(req, res, next) {
+    req.checkBody({
+        '_ids': {
+            notEmpty: {
+                options: [true],
+                errorMessage: '_ids 不能为空'
+            },
+            isArray: { errorMessage: '_ids 需为数组' }
+        },
+
+    })
+    var param = req.body
+    var data = { 'publish': 1, }
+    var _ids = param._ids
+    classifyModel.update({ '_id': { $in: _ids } }, data, { 'multi': true }, function(err, results) {
+        err ? res.send(err) : '';
+        res.status(200).json({
+            'code': '1',
+            'msg': results
+        });
+    })
+}
+
+
+/**
+ *  下线分类
+ * 
+ * @Author   suqinhai
+ * @DateTime 2017-08-03
+ * @QQ       467456744
+ * @return   {[type]}        [description]
+ */
+exports.downClassify = async function(req, res, next) {
+    req.checkBody({
+        '_ids': {
+            notEmpty: {
+                options: [true],
+                errorMessage: '_ids 不能为空'
+            },
+            isArray: { errorMessage: '_ids 需为数组' }
+        },
+
+    })
+    var param = req.body
+    var data = { 'publish': 0, }
+    var _ids = param._ids
+    classifyModel.update({ '_id': { $in: _ids } }, data, { 'multi': true }, function(err, results) {
+        err ? res.send(err) : '';
+        res.status(200).json({
+            'code': '1',
+            'msg': results
+        });
+    })
+}
+
+
+/**
+ * 获取第三方分类下拉
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.getThirdPropertySelect = async function(req, res, next) {
+    var param = req.query
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+
+
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
+
+    var data = {};
+
+    param.name ? data.name = new RegExp(param.name) : '';
+
+    var thirdPropertyIds = _.chain(await classifyModel.find({})).map(function(chr) {
+        return chr.thirdPropertyIds.join(',');
+    }).value();
+
+    var thirdPropertyIds = _.union(thirdPropertyIds.join(',').split(','), true);
+
+    var count = await thirdPropertyModel.count(data)
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
+    data = {
+        '_id':{$not:thirdPropertyIds}
+    };
+    thirdPropertyModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('name url sort createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
+
+}
+
+
+/**
+ * 获取第三方分类
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.getThirdProperty = async function(req, res, next) {
+    var param = req.query
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+
+
+
+    if (req.validationErrors()) {
+        return res.status(400).json({
+            'code': '0',
+            'data': req.validationErrors()
+        });
+    }
+
+    var data = {};
+
+    param.name ? data.name = new RegExp(param.name) : '';
+
+    var count = await thirdPropertyModel.count(data)
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
+
+    thirdPropertyModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('name url sort createTime updateTime')
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
+
+}
+
+/**
+ * 添加第三方分类
+ * @Author   suqinhai
+ * @DateTime 2017-07-16
+ * @QQ       467456744
+ * @return   {[type]}
+ */
+exports.addThirdProperty = function(req, res, next) {
 
     req.checkBody({
         'name': {
@@ -127,24 +493,24 @@ exports.add = function(req, res, next) {
         'updateTime': util.dataFormat(new Date()),
     };
 
-    classifyModel.create(data, function(err, results) {
+    thirdPropertyModel.create(data, function(err, results) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': 'ok'
         });
     })
 
 }
 
 /**
- * 修改分类
+ * 修改第三方分类
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.modify = function(req, res, next) {
+exports.modifyThirdProperty = function(req, res, next) {
 
     req.checkBody({
         '_id': {
@@ -190,23 +556,23 @@ exports.modify = function(req, res, next) {
         'updateTime': util.dataFormat(new Date())
     };
 
-    classifyModel.update({ '_id': _id }, data, function(err, results) {
+    thirdPropertyModel.update({ '_id': _id }, data, function(err, results) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': 'ok'
         });
     })
 }
 
 /**
- * 删除分类
+ * 删除第三方分类
  * @Author   suqinhai
  * @DateTime 2017-07-16
  * @QQ       467456744
  * @return   {[type]}
  */
-exports.del = function(req, res, next) {
+exports.delThirdProperty = function(req, res, next) {
 
     req.checkBody({
         '_ids': {
@@ -232,7 +598,7 @@ exports.del = function(req, res, next) {
         '_id': { $in: param._ids }
     }
 
-    classifyModel.remove(data)
+    thirdPropertyModel.remove(data)
         .exec(function(err, data) {
             err ? res.send(err) : '';
             res.status(200).json({
@@ -241,7 +607,3 @@ exports.del = function(req, res, next) {
             });
         })
 }
-
-
-
-

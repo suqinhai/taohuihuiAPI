@@ -159,7 +159,7 @@ exports.add = function(req, res, next) {
     goodsModel.create(data, function(err, results) {
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': 'ok'
         });
     });
 }
@@ -206,7 +206,7 @@ exports.status = function(req, res, next) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': 'ok'
         });
     })
 
@@ -253,7 +253,7 @@ exports.modify = function(req, res, next) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': 'ok'
         });
     })
 }

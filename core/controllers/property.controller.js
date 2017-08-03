@@ -119,7 +119,7 @@ exports.addProperty = function(req, res, next) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': 'ok'
         });
     })
 
@@ -182,7 +182,7 @@ exports.modifyProperty = function(req, res, next) {
         err ? res.send(err) : '';
         res.status(200).json({
             'code': '1',
-            'data': results
+            'data': 'ok'
         });
     })
 }
