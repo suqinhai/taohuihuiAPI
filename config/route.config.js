@@ -152,6 +152,9 @@ const routers = {
     '/goods/get': {
         'get': 'goods.get'
     },
+    '/goods/getFindGoods': {
+        'get': 'goods.getFindGoods'
+    },
     '/goods/status': {
         'post': 'goods.status'
     },
