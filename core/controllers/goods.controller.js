@@ -11,25 +11,20 @@ const classifyModel = require('../models/classify.model.js');
  * @return   {[type]}
  */
 exports.get = async function(req, res, next) {
+
     var param = req.query
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+    param.name ? data.name = new RegExp(param.name) : '';
 
     if (param.publish === 0 || param.publish === '0') {
-        var data = {
-            'publish': { $in: ['', 0] }
-        };
-    } else if (param.publish == 1) {
-        var data = {
-            'publish': param.publish
-        };
+        var data = { 'publish': { $in: ['', 0] } };
+    }
+    if (param.publish == 1) {
+        var data = { 'publish': param.publish };
     }
 
-    var data = {
-        'publish': param.publish // 0 未发布  1 发布
-    };
-
-    param.name ? data.name = new RegExp(param.name) : '';
+    var data = { 'publish': param.publish }; // 0 未发布  1 发布
 
     var count = await goodsModel.count(data)
         .exec(function(err, count) {
@@ -108,11 +103,7 @@ exports.getItem = async function(req, res, next) {
  * @param    {Function}       next [description]
  * @return   {[type]}              [description]
  */
-exports.getFindGoods = async function(req, res, next) {
-    var data = {}
-    var param = req.query
-    var page = parseInt((param.page ? param.page : 1));
-    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+exports.getFindGoods = async function(req, res, next) {、
 
     req.checkQuery({
         'classifyId': {
@@ -122,42 +113,46 @@ exports.getFindGoods = async function(req, res, next) {
             },
         }
     })
-    
-    var sort;
+
+    var data = {}
+    var param = req.query
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
     var thirdPropertyData = await classifyModel.findOne({ '_id': param.classifyId }).select('thirdPropertyNames');
     param.name ? data.name = new RegExp(param.name) : '';
-    data.category = thirdPropertyData.thirdPropertyNames;
-    data.publish = 1;
 
     // 销量降序
     if (param.biz30day == 'desc') {
-        sort = { 'biz30day': -1 }
+        var sort = { 'biz30day': -1 }
     }
 
     // 销量升序
     if (param.biz30day == 'asc') {
-        sort = { 'biz30day': 1 }
+        var sort = { 'biz30day': 1 }
     }
 
-     // 价格降序
+    // 价格降序
     if (param.zkPrice == 'desc') {
-        sort = { 'biz30day': -1 }
+        var sort = { 'biz30day': -1 }
     }
 
     // 价格升序
     if (param.zkPrice == 'asc') {
-        sort = { 'zkPrice': 1 }
+        var sort = { 'zkPrice': 1 }
     }
 
     // 淘宝
     if (param.userType == '0') {
-        data.userType  = param.userType;
+        var data.userType = 0;
     }
 
     // 天猫 
     if (param.userType == '1') {
-        data.userType  = param.userType;
+        var data.userType = 1;
     }
+
+    data.publish = 1;
+    data.category = thirdPropertyData.thirdPropertyNames;
 
     var count = await goodsModel.count(data)
         .exec(function(err, count) {
