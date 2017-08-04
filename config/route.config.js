@@ -108,6 +108,30 @@ const routers = {
     '/classify/del': {
         'post': 'classify.del'
     },
+    '/classify/upClassify': {
+        'post': 'classify.upClassify'
+    },
+    '/classify/downClassify': {
+        'post': 'classify.downClassify'
+    },
+
+     // 分类管理接口
+    '/classify/getThirdPropertySelect': {
+        'get': 'classify.getThirdPropertySelect'
+    }, 
+    '/classify/getThirdProperty': {
+        'get': 'classify.getThirdProperty'
+    },
+    '/classify/addThirdProperty': {
+        'post': 'classify.addThirdProperty'
+    },
+    '/classify/modifyThirdProperty': {
+        'post': 'classify.modifyThirdProperty'
+    },
+    '/classify/delThirdProperty': {
+        'post': 'classify.delThirdProperty'
+    },
+
 
     // 分类属性管理接口
     '/property/getProperty': {
