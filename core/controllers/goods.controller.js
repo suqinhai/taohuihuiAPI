@@ -93,7 +93,7 @@ exports.getItem = async function(req, res, next) {
 
 /**
  *
- * 搜索分类商品
+ * 获取分类商品
  * 
  * @Author   suqinhai
  * @Contact  467456744@qq.com
@@ -103,7 +103,7 @@ exports.getItem = async function(req, res, next) {
  * @param    {Function}       next [description]
  * @return   {[type]}              [description]
  */
-exports.getFindGoods = async function(req, res, next) {、
+exports.getClassifyGoods = async function(req, res, next) {、
 
     req.checkQuery({
         'classifyId': {
@@ -153,6 +153,87 @@ exports.getFindGoods = async function(req, res, next) {、
 
     data.publish = 1;
     data.category = thirdPropertyData.thirdPropertyNames;
+
+    var count = await goodsModel.count(data)
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
+
+    goodsModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .sort(sort) // -1 降序 1 升序 
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
+}
+
+
+/**
+ *
+ * 搜索商品
+ * 
+ * @Author   suqinhai
+ * @Contact  467456744@qq.com
+ * @DateTime 2017-08-04
+ * @param    {[type]}         req  [description]
+ * @param    {[type]}         res  [description]
+ * @param    {Function}       next [description]
+ * @return   {[type]}              [description]
+ */
+exports.getSearchGoods = async function(req, res, next) {
+
+    var data = {}
+    var param = req.query
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+
+    // 商品名称
+    if ( param.name ){
+        data.title = new RegExp(param.name)
+    }
+    
+    // 销量降序
+    if (param.biz30day == 'desc') {
+        var sort = { 'biz30day': -1 }
+    }
+
+    // 销量升序
+    if (param.biz30day == 'asc') {
+        var sort = { 'biz30day': 1 }
+    }
+
+    // 价格降序
+    if (param.zkPrice == 'desc') {
+        var sort = { 'biz30day': -1 }
+    }
+
+    // 价格升序
+    if (param.zkPrice == 'asc') {
+        var sort = { 'zkPrice': 1 }
+    }
+
+    // 淘宝
+    if (param.userType == '0') {
+        var data.userType = 0;
+    }
+
+    // 天猫 
+    if (param.userType == '1') {
+        var data.userType = 1;
+    }
+
+    data.publish = 1;
+
 
     var count = await goodsModel.count(data)
         .exec(function(err, count) {

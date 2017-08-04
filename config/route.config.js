@@ -152,9 +152,6 @@ const routers = {
     '/goods/get': {
         'get': 'goods.get'
     },
-    '/goods/getFindGoods': {
-        'get': 'goods.getFindGoods'
-    },
     '/goods/status': {
         'post': 'goods.status'
     },
@@ -164,7 +161,12 @@ const routers = {
     '/goods/del': {
         'post': 'goods.del'
     },
-
+    '/goods/getClassifyGoods': {
+        'get': 'goods.getClassifyGoods'
+    },
+    '/goods/getSearchGoods': {
+        'get': 'goods.getSearchGoods'
+    },
 
 
     /*
