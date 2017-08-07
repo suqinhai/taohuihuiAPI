@@ -15,6 +15,11 @@ const bottomMenuSchema = new mongoose.Schema({
 		required: true,
 		enum:['index','classify','circle','account'] //  index 首页  classify 分类   circle 朋友圈   account 我的账户
 	},
+	'publish':{
+		type: Number,
+		required: true,
+		default:0,
+	},
 	'sort':{
 		type: Number,
 		required: true

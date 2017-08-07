@@ -18,6 +18,11 @@ const posterSchema = new mongoose.Schema({
 		type: String,
 		required: false
 	},
+	'publish':{
+		type: Number,
+		required: true,
+		default:0,
+	},
 	'alt':{
 		type: String,
 		required: false

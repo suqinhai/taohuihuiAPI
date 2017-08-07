@@ -98,14 +98,6 @@ const goodsSchema = new mongoose.Schema({
         type: Array,
         required: false
     },
-    mainPic: {
-        type: Array,
-        required: false
-    },
-    detailsPic: {
-        type: Array,
-        required: false
-    },
     sort: {
         type: Number,
         default:0,

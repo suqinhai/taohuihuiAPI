@@ -63,6 +63,12 @@ const routers = {
     '/nav/del': {
         'post': 'nav.del'
     },
+    '/nav/upNav': {
+        'post': 'nav.upNav'
+    },
+    '/nav/downNav': {
+        'post': 'nav.downNav'
+    },
 
 
     // 首页海报轮播
@@ -78,6 +84,12 @@ const routers = {
     '/poster/del': {
         'post': 'poster.del'
     },
+    '/poster/upPoster': {
+        'post': 'poster.upPoster'
+    },
+    '/poster/downPoster': {
+        'post': 'poster.downPoster'
+    },
 
 
     // 首页底部浮动菜单
@@ -92,6 +104,12 @@ const routers = {
     },
     '/bottomMenu/del': {
         'post': 'bottomMenu.del'
+    },
+    '/bottomMenu/upBottomMenu': {
+        'post': 'bottomMenu.upBottomMenu'
+    },
+    '/bottomMenu/downBottomMenu': {
+        'post': 'bottomMenu.downBottomMenu'
     },
 
 
@@ -161,12 +179,7 @@ const routers = {
     '/goods/del': {
         'post': 'goods.del'
     },
-    '/goods/getClassifyGoods': {
-        'get': 'goods.getClassifyGoods'
-    },
-    '/goods/getSearchGoods': {
-        'get': 'goods.getSearchGoods'
-    },
+    
 
 
     /*
@@ -192,6 +205,15 @@ const routers = {
     },
     '/frontend/property/getProperty': {
         'get': 'property.getProperty'
+    },
+    '/frontend/goods/getClassifyGoods': {
+        'get': 'goods.getClassifyGoods'
+    },
+    '/frontend/goods/getActivityClassGoods': {
+        'get': 'goods.getActivityClassGoods'
+    },
+    '/frontend/goods/getSearchGoods': {
+        'get': 'goods.getSearchGoods'
     },
     
 

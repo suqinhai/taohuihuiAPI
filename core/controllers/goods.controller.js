@@ -2,7 +2,8 @@
 const util = require('../util/util.js');
 const goodsModel = require('../models/goods.model.js');
 const classifyModel = require('../models/classify.model.js');
-
+const navModel = require('../models/nav.model.js');
+const goodsDetails = require('../models/goodsDetails.model.js');
 /**
  * 获取首页商品
  * @Author   suqinhai
@@ -91,6 +92,61 @@ exports.getItem = async function(req, res, next) {
 
 
 
+
+/**
+ * 获取活动商品
+ * 
+ * @Author   suqinhai
+ * @DateTime 2017-08-05
+ * @QQ       467456744
+ * @param    {[type]}   req  [description]
+ * @param    {[type]}   res  [description]
+ * @param    {Function} next [description]
+ * @return   {[type]}        [description]
+ */
+exports.getActivityClassGoods = async function(req, res, next) {
+    
+    req.checkQuery({
+        'activityClass': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'activityClass 不能为空'
+            },
+        }
+    })
+
+    var data = {}
+    var param = req.query
+    var page = parseInt((param.page ? param.page : 1));
+    var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+
+    data.publish = 1;
+    data.activityClass = param.activityClass;
+
+    var count = await goodsModel.count(data)
+        .exec(function(err, count) {
+            err ? res.send(err) : '';
+            return count
+        })
+
+    goodsModel.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .sort(sort) // -1 降序 1 升序 
+        .lean()
+        .exec(function(err, data) {
+            err ? res.send(err) : '';
+            res.status(200).json({
+                'code': '1',
+                'count': count,
+                'list': data,
+                'total_page': Math.ceil(count / pageSize),
+                'now_page': page
+            });
+        })
+}
+
+
 /**
  *
  * 获取分类商品
@@ -103,7 +159,7 @@ exports.getItem = async function(req, res, next) {
  * @param    {Function}       next [description]
  * @return   {[type]}              [description]
  */
-exports.getClassifyGoods = async function(req, res, next) {、
+exports.getClassifyGoods = async function(req, res, next) {
 
     req.checkQuery({
         'classifyId': {
@@ -119,7 +175,7 @@ exports.getClassifyGoods = async function(req, res, next) {、
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
     var thirdPropertyData = await classifyModel.findOne({ '_id': param.classifyId }).select('thirdPropertyNames');
-    param.name ? data.name = new RegExp(param.name) : '';
+    param.name ? data.title = new RegExp(param.name) : '';
 
     // 销量降序
     if (param.biz30day == 'desc') {
@@ -133,7 +189,7 @@ exports.getClassifyGoods = async function(req, res, next) {、
 
     // 价格降序
     if (param.zkPrice == 'desc') {
-        var sort = { 'biz30day': -1 }
+        var sort = { 'zkPrice': -1 }
     }
 
     // 价格升序
@@ -143,12 +199,22 @@ exports.getClassifyGoods = async function(req, res, next) {、
 
     // 淘宝
     if (param.userType == '0') {
-        var data.userType = 0;
+        data.userType = 0;
     }
 
     // 天猫 
     if (param.userType == '1') {
-        var data.userType = 1;
+        data.userType = 1;
+    }
+
+    // 优惠券最底 
+    if (param.couponAmount == 'desc') {
+        var sort = { 'couponAmount': -1 }
+    }
+
+    // 优惠券最高
+    if (param.couponAmount == 'asc') {
+        var sort = { 'couponAmount': 1 }
     }
 
     data.publish = 1;
@@ -196,13 +262,9 @@ exports.getSearchGoods = async function(req, res, next) {
     var param = req.query
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
-
+    param.name ? data.title = new RegExp(param.name) : '';
     // 商品名称
-    if ( param.name ){
-        data.title = new RegExp(param.name)
-    }
-    
-    // 销量降序
+     // 销量降序
     if (param.biz30day == 'desc') {
         var sort = { 'biz30day': -1 }
     }
@@ -214,7 +276,7 @@ exports.getSearchGoods = async function(req, res, next) {
 
     // 价格降序
     if (param.zkPrice == 'desc') {
-        var sort = { 'biz30day': -1 }
+        var sort = { 'zkPrice': -1 }
     }
 
     // 价格升序
@@ -224,12 +286,22 @@ exports.getSearchGoods = async function(req, res, next) {
 
     // 淘宝
     if (param.userType == '0') {
-        var data.userType = 0;
+        data.userType = 0;
     }
 
     // 天猫 
     if (param.userType == '1') {
-        var data.userType = 1;
+        data.userType = 1;
+    }
+
+    // 优惠券最底 
+    if (param.couponAmount == 'desc') {
+        var sort = { 'couponAmount': -1 }
+    }
+
+    // 优惠券最高
+    if (param.couponAmount == 'asc') {
+        var sort = { 'couponAmount': 1 }
     }
 
     data.publish = 1;
@@ -270,11 +342,21 @@ exports.getSearchGoods = async function(req, res, next) {
  * @return   {[type]}
  */
 exports.getDetails = async function(req, res, next) {
+
+    req.checkQuery({
+        'goodId': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'goodId 不能为空'
+            },
+        }
+    })
+    
     var param = req.query
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
     var data = {
-        '_id': param._id
+        'goodId': param.goodId
     };
 
     param.name ? data.name = new RegExp(param.name) : '';
@@ -285,7 +367,9 @@ exports.getDetails = async function(req, res, next) {
             return count
         })
 
-    goodsModel.find(data)
+    goodsDetails.find(data)
+        .select('goodId brand popular sellerPromise payMethod promoType goldSellers mainPic detailsPic')
+        .populate('goodId','auctionId auctionUrl biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .lean()
@@ -471,3 +555,5 @@ exports.del = function(req, res, next) {
             });
         })
 }
+
+

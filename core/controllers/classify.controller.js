@@ -3,6 +3,7 @@ const _ = require('lodash');
 const util = require('../util/util.js');
 const classifyModel = require('../models/classify.model.js');
 const thirdPropertyModel = require('../models/thirdProperty.model.js');
+const navModel = require('../models/nav.model.js');
 
 
 /**
@@ -353,36 +354,29 @@ exports.getThirdPropertySelect = async function(req, res, next) {
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
     param.name ? data.name = new RegExp(param.name) : '';
 
-    req.checkQuery({
-        'classifyId': {
-            notEmpty: {
-                options: [true],
-                errorMessage: 'classifyId 不能为空'
-            },
-        },
-    })
 
-    if (req.validationErrors()) {
-        return res.status(400).json({
-            'code': '0',
-            'data': req.validationErrors()
-        });
+    if (param.classifyId) {
+        var classifyId = { '_id': { $nin: [param.classifyId] } }
+    } else {
+        var classifyId = {};
     }
 
-    var thirdPropertyIds = _.chain(await classifyModel.find({
-        '_id': { $nin: [param.classifyId] }
-    })).map(function(chr) {
+    var thirdPropertyIds = _.chain(await classifyModel.find(classifyId)).map(function(chr) {
         return chr.thirdPropertyIds.join(',')
     }).value();
 
-    data = { '_id': { $nin: _.union(_.compact(thirdPropertyIds).join(',').split(','), true) } };
+    if (_.compact(thirdPropertyIds).join(',')) {
+        data = { '_id': { $nin: _.union(_.compact(thirdPropertyIds).join(',').split(','), true) } };
+    } else {
+        data = {}
+    }
 
     var count = await thirdPropertyModel.count(data)
         .exec(function(err, count) {
             err ? res.send(err) : '';
             return count
         })
-        
+
     thirdPropertyModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)

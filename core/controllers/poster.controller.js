@@ -26,7 +26,7 @@ exports.getPoster = async function(req, res, next) {
     posterModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('title url img sort alt createTime updateTime')
+        .select('title url img sort publish alt createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -63,7 +63,7 @@ exports.get = async function(req, res, next) {
     posterModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('title url img sort alt createTime updateTime')
+        .select('title url img sort publish alt createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -253,4 +253,67 @@ exports.del = function(req, res, next) {
                 'data': data
             });
         })
+}
+
+/**
+ *  上线分类
+ * 
+ * @Author   suqinhai
+ * @DateTime 2017-08-03
+ * @QQ       467456744
+ * @return   {[type]}        [description]
+ */
+exports.upPoster = async function(req, res, next) {
+    req.checkBody({
+        '_ids': {
+            notEmpty: {
+                options: [true],
+                errorMessage: '_ids 不能为空'
+            },
+            isArray: { errorMessage: '_ids 需为数组' }
+        },
+
+    })
+    var param = req.body
+    var data = { 'publish': 1, }
+    var _ids = param._ids
+    posterModel.update({ '_id': { $in: _ids } }, data, { 'multi': true }, function(err, results) {
+        err ? res.send(err) : '';
+        res.status(200).json({
+            'code': '1',
+            'msg': results
+        });
+    })
+}
+
+
+/**
+ *  下线分类
+ * 
+ * @Author   suqinhai
+ * @DateTime 2017-08-03
+ * @QQ       467456744
+ * @return   {[type]}        [description]
+ */
+exports.downPoster = async function(req, res, next) {
+    req.checkBody({
+        '_ids': {
+            notEmpty: {
+                options: [true],
+                errorMessage: '_ids 不能为空'
+            },
+            isArray: { errorMessage: '_ids 需为数组' }
+        },
+
+    })
+    var param = req.body
+    var data = { 'publish': 0, }
+    var _ids = param._ids
+    posterModel.update({ '_id': { $in: _ids } }, data, { 'multi': true }, function(err, results) {
+        err ? res.send(err) : '';
+        res.status(200).json({
+            'code': '1',
+            'msg': results
+        });
+    })
 }

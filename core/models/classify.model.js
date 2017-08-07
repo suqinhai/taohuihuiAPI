@@ -14,18 +14,18 @@ const classifySchema = new mongoose.Schema({
 		type: Number,
 		required: true
 	},
-	thirdPropertyIds:{
-		type: Array,
-		required: true
-	},
-	thirdPropertyNames:{
-		type: Array,
-		required: true
-	},
-	publish:{
+	'publish':{
 		type: Number,
 		required: true,
 		default:0,
+	},
+	'thirdPropertyIds':{
+		type: Array,
+		required: true
+	},
+	'thirdPropertyNames':{
+		type: Array,
+		required: true
 	},
 	'propertyId':[{
 		type: mongoose.Schema.Types.ObjectId,
