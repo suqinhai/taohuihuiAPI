@@ -28,7 +28,7 @@ exports.get = async function(req, res, next) {
     userModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('user name email user createTime updateTime')
+        .select('user password name email createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -51,31 +51,31 @@ exports.get = async function(req, res, next) {
  * @return   {[type]}
  */
 
-exports.add = function(req, res, next) {
+exports.add = async function(req, res, next) {
 
     req.checkBody({
-        'name': {
-            notEmpty: {
-                options: [true],
-                errorMessage: 'name 不能为空'
-            }
-        },
-        'email': {
-            notEmpty: {
-                options: [true],
-                errorMessage: 'email 不能为空'
-            }
-        },
         'user': {
             notEmpty: {
                 options: [true],
                 errorMessage: 'user 不能为空'
             }
         },
-        'newPasswd': {
+        'password': {
             notEmpty: {
                 options: [true],
-                errorMessage: 'newPasswd 不能为空'
+                errorMessage: 'password 不能为空'
+            }
+        },
+        'confirmPassword': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'confirmPassword 不能为空'
+            }
+        },
+        'email': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'email 不能为空'
             }
         },
     })
@@ -87,38 +87,50 @@ exports.add = function(req, res, next) {
         });
     }
 
+
     var param = req.body
+
+    if (　param.password != param.confirmPassword) {
+        res.status(200).json({
+            'code': '0',
+            'msg': '2次输入的密码不一致'
+        });
+    }
+
     var data = {
-        'name':param.name,
-        'email':param.email,
-        'user':param.user,
-        'passwd':param.newPasswd,
-        'createTime':util.dataFormat(new Date()),
-        'updateTime':util.dataFormat(new Date())
+        'user': param.user,
+        'password': param.password,
+        'name': 'H_' + param.user,
+        'email': param.email,
+        'createTime': util.dataFormat(new Date()),
+        'updateTime': util.dataFormat(new Date())
     }
 
     /*判断有没有这个用户*/
-    userModel.findOne({ 'user': data.user })
-        .then(function(result) {
-            if (result) {
+    var isUser = await userModel.findOne({ 'user': data.user })
+        .then(function(data) {
+            if (data) {
                 res.status(200).json({
-                    'code': '1',
+                    'code': '0',
                     'msg': '已存在该用户！'
                 });
-            } else {
-                /*新增用户*/
-                userModel.create(data,function(err,data){
-                    if (err){
-                        console.log(err)
-                    }
-                    res.status(200).json({
-                        'code': '1',
-                        'msg': '新增用户成功！'
-                    });
-                })
-                
+                return true;
             }
+            return false
         });
+
+    //新增用户
+    if (!isUser) {
+        userModel.create(data, function(err, data) {
+            if (err) {
+                console.log(err)
+            }
+            res.status(200).json({
+                'code': '1',
+                'msg': '注册成功！'
+            });
+        })
+    }
 }
 
 /**
@@ -129,25 +141,25 @@ exports.add = function(req, res, next) {
  * @return   {[type]}
  */
 
-exports.modify = function(req, res, next) {
+exports.modify = async function(req, res, next) {
 
-     req.checkBody({
-        'name': {
+    req.checkBody({
+        'user': {
             notEmpty: {
                 options: [true],
-                errorMessage: 'name 不能为空'
+                errorMessage: 'user 不能为空'
+            }
+        },
+        'newPassword': {
+            notEmpty: {
+                options: [true],
+                errorMessage: 'newPassword 不能为空'
             }
         },
         'email': {
             notEmpty: {
                 options: [true],
                 errorMessage: 'email 不能为空'
-            }
-        },
-        'newPasswd':{
-            notEmpty: {
-                options: [true],
-                errorMessage: 'newPasswd 不能为空'
             }
         },
     })
@@ -163,38 +175,41 @@ exports.modify = function(req, res, next) {
     var _id = param._id
 
     var data = {
-        'name':param.name,
-        'email':param.email,
-        'updateTime':util.dataFormat(new Date()),
+        'user': param.user,
+        'email': param.email,
+        'password': param.newPassword,
+        'updateTime': util.dataFormat(new Date()),
     }
 
     /*判断有没有这个用户*/
-    userModel.findOne({ '_id':_id,'passwd':param.passwd})
-        .then(function(result) {
-            if ( !result ) {
+    var isUser = await userModel.findOne({ 'user': param.user, 'email': param.email })
+        .then(function(data) {
+            if (data) {
+                return true;
+            }
+            res.status(200).json({
+                'code': '0',
+                'msg': '用户名或邮箱不正确'
+            });
+            return false
+        });
+    /* 更新密码*/
+    if (isUser) {
+        userModel.update({ 'user': param.user }, data, function(data) {
+            if (data) {
                 res.status(200).json({
-                    'code': '0',
-                    'msg': '密码错误！'
+                    'code': '1',
+                    'msg': '修改成功！'
                 });
             } else {
-                data.passwd = param.newPasswd
-                /* 更新密码*/
-                userModel.update({'_id':_id}, data , function(result) {
-                        if (result) {
-                            res.status(200).json({
-                                'code': '1',
-                                'msg': '修改成功！'
-                            });
-                        } else {
-                            res.status(200).json({
-                                'code': '1',
-                                'msg': '修改失败！'
-                            });
-                        }
+                res.status(200).json({
+                    'code': '0',
+                    'msg': '修改失败！'
                 });
             }
-
         });
+    }
+
 }
 
 /**
@@ -214,7 +229,6 @@ exports.del = function(req, res, next) {
             },
             isArray: { errorMessage: '_ids 需为数组' }
         },
-
     })
 
     if (req.validationErrors()) {
@@ -260,10 +274,10 @@ exports.login = function(req, res, next) {
                 errorMessage: 'user 不能为空'
             }
         },
-        'passwd': {
+        'password': {
             notEmpty: {
                 options: [true],
-                errorMessage: 'passwd 不能为空'
+                errorMessage: 'password 不能为空'
             }
         },
     })
@@ -277,13 +291,13 @@ exports.login = function(req, res, next) {
 
     var param = req.body
     var data = {
-        user:param.user,
-        passwd:param.passwd,
+        user: param.user,
+        password: param.password,
     }
 
     /*登陆判断*/
     userModel.findOne(data)
-        .select('name user email createTime updateTime')
+        .select('')
         .lean()
         .exec(function(err, result) {
             if (result) {
@@ -291,7 +305,7 @@ exports.login = function(req, res, next) {
                 res.status(200).json({
                     'code': '1',
                     'msg': '登陆成功！',
-                    'data':result
+                    'data': result
                 });
             } else {
                 res.status(200).json({
