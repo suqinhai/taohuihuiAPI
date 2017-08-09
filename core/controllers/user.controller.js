@@ -51,7 +51,7 @@ exports.get = async function(req, res, next) {
  * @return   {[type]}
  */
 
-exports.add = async function(req, res, next) {
+exports.register = async function(req, res, next) {
 
     req.checkBody({
         'user': {
@@ -150,10 +150,10 @@ exports.modify = async function(req, res, next) {
                 errorMessage: 'user 不能为空'
             }
         },
-        'newPassword': {
+        'password': {
             notEmpty: {
                 options: [true],
-                errorMessage: 'newPassword 不能为空'
+                errorMessage: 'password 不能为空'
             }
         },
         'email': {
@@ -177,7 +177,7 @@ exports.modify = async function(req, res, next) {
     var data = {
         'user': param.user,
         'email': param.email,
-        'password': param.newPassword,
+        'password': param.password,
         'updateTime': util.dataFormat(new Date()),
     }
 
@@ -195,7 +195,8 @@ exports.modify = async function(req, res, next) {
         });
     /* 更新密码*/
     if (isUser) {
-        userModel.update({ 'user': param.user }, data, function(data) {
+        userModel.update({ 'user': param.user,'email': param.email }, {'password':param.password,'updateTime':util.dataFormat(new Date())}, function(err,data) {
+            err ? res.send(data) : '';
             if (data) {
                 res.status(200).json({
                     'code': '1',
@@ -297,7 +298,7 @@ exports.login = function(req, res, next) {
 
     /*登陆判断*/
     userModel.findOne(data)
-        .select('')
+        .select('email name user')
         .lean()
         .exec(function(err, result) {
             if (result) {
@@ -310,7 +311,7 @@ exports.login = function(req, res, next) {
             } else {
                 res.status(200).json({
                     'code': '0',
-                    'msg': '账号或密码错误！'
+                    'msg': '账号名或密码错误，请重试'
                 });
             }
         });

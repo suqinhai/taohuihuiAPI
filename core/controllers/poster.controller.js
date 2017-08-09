@@ -27,6 +27,7 @@ exports.getPoster = async function(req, res, next) {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .select('title url img sort publish alt createTime updateTime')
+        .sort({'sort':-1}) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -64,6 +65,7 @@ exports.get = async function(req, res, next) {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .select('title url img sort publish alt createTime updateTime')
+        .sort({'sort':-1}) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';

@@ -36,6 +36,7 @@ exports.get = async function(req, res, next) {
     goodsModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
+        .sort({'sort':-1}) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -77,6 +78,7 @@ exports.getItem = async function(req, res, next) {
     goodsModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
+        .sort({'sort':-1}) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -344,19 +346,22 @@ exports.getSearchGoods = async function(req, res, next) {
 exports.getDetails = async function(req, res, next) {
 
     req.checkQuery({
-        'goodId': {
+        '_id': {
             notEmpty: {
                 options: [true],
-                errorMessage: 'goodId 不能为空'
+                errorMessage: '_id 不能为空'
             },
         }
     })
+
+    console.log(req.query._id)
     
     var param = req.query
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+
     var data = {
-        'goodId': param.goodId
+        'goodId': param._id
     };
 
     param.name ? data.name = new RegExp(param.name) : '';
@@ -367,11 +372,12 @@ exports.getDetails = async function(req, res, next) {
             return count
         })
 
-    goodsDetails.find(data)
+    goodsDetails.findOne(data)
         .select('goodId brand popular sellerPromise payMethod promoType goldSellers mainPic detailsPic')
-        .populate('goodId','auctionId auctionUrl biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
+        .populate('goodId','auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
         .skip((page - 1) * pageSize)
         .limit(pageSize)
+        .sort({'sort':-1}) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';

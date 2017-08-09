@@ -8,7 +8,6 @@ const project = require('./project.config.js');
 
 
 const routers = {
-
     // 后台用户管理路由
     '/admin/get': {
         'get': 'admin.get'
@@ -33,21 +32,10 @@ const routers = {
     '/user/get': {
         'get': 'user.get'
     },
-    '/user/add': {
-        'post': 'user.add'
-    },
-    '/user/modify': {
-        'post': 'user.modify'
-    },
-    '/user/del': {
-        'post': 'user.del'
-    },
-    '/user/login': {
-        'post': 'user.login'
-    },
-    '/user/logout': {
-        'get': 'user.logout'
-    },
+    // '/user/del': {
+    //     'post': 'user.del'
+    // },
+
 
 
     // 首页头部菜单
@@ -69,6 +57,10 @@ const routers = {
     '/nav/downNav': {
         'post': 'nav.downNav'
     },
+    '/nav/activityActionTypeof': {
+        'get': 'nav.activityActionTypeof'
+    },
+
 
 
     // 首页海报轮播
@@ -133,10 +125,10 @@ const routers = {
         'post': 'classify.downClassify'
     },
 
-     // 分类管理接口
+    // 分类管理接口
     '/classify/getThirdPropertySelect': {
         'get': 'classify.getThirdPropertySelect'
-    }, 
+    },
     '/classify/getThirdProperty': {
         'get': 'classify.getThirdProperty'
     },
@@ -149,7 +141,6 @@ const routers = {
     '/classify/delThirdProperty': {
         'post': 'classify.delThirdProperty'
     },
-
 
     // 分类属性管理接口
     '/property/getProperty': {
@@ -165,8 +156,7 @@ const routers = {
         'post': 'property.delProperty'
     },
 
-
-     // 商品管理接口
+    // 商品管理接口
     '/goods/get': {
         'get': 'goods.get'
     },
@@ -179,53 +169,65 @@ const routers = {
     '/goods/del': {
         'post': 'goods.del'
     },
-    
+}
 
 
-    /*
-        前台接口
-     */
-    '/frontend/goods/getDetails': {
+/*
+   前台接口
+*/
+const frontend = {
+    '/goods/getDetails': {
         'get': 'goods.getDetails'
     },
-    '/frontend/goods/getItem': {
+    '/goods/getItem': {
         'get': 'goods.getItem'
     },
-    '/frontend/nav/getNav': {
+    '/nav/getNav': {
         'get': 'nav.getNav'
     },
-    '/frontend/bottomMenu/getMenu': {
+    '/bottomMenu/getMenu': {
         'get': 'bottomMenu.getMenu'
     },
-    '/frontend/poster/getPoster': {
+    '/poster/getPoster': {
         'get': 'poster.getPoster'
     },
-    '/frontend/classify/getClassify': {
+    '/classify/getClassify': {
         'get': 'classify.getClassify'
     },
-    '/frontend/property/getProperty': {
+    '/property/getProperty': {
         'get': 'property.getProperty'
     },
-    '/frontend/goods/getClassifyGoods': {
+    '/goods/getClassifyGoods': {
         'get': 'goods.getClassifyGoods'
     },
-    '/frontend/goods/getActivityClassGoods': {
+    '/goods/getActivityClassGoods': {
         'get': 'goods.getActivityClassGoods'
     },
-    '/frontend/goods/getSearchGoods': {
+    '/goods/getSearchGoods': {
         'get': 'goods.getSearchGoods'
     },
-    
+    '/user/login': {
+        'post': 'user.login'
+    },
+    '/user/logout': {
+        'get': 'user.logout'
+    },
+    '/user/register': {
+        'post': 'user.register'
+    },
+    '/user/modify': {
+        'post': 'user.modify'
+    },
 
-    
-
-    
-
-    
 }
 
 const rs = {};
-for (var router in routers){
+
+for (var router in routers) {
     rs['/' + project.projectName + router] = routers[router]
 }
+for (var router in frontend) {
+    rs['/' + project.projectName + '/frontend' + router] = frontend[router]
+}
+
 module.exports = rs

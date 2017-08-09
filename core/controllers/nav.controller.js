@@ -3,7 +3,7 @@ const _ = require('lodash');
 const util = require('../util/util.js');
 const navModel = require('../models/nav.model.js');
 const thirdPropertyModel = require('../models/thirdProperty.model.js');
-
+const goodsDetails = require('../models/goodsDetails.model.js');
 /**
  * 获取前台首页导航列表
  * @Author   suqinhai
@@ -27,7 +27,7 @@ exports.getNav = async function(req, res, next) {
     navModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .sort({'sort':-1}) // -1 降序 1 升序 
+        .sort({ 'sort': -1 }) // -1 降序 1 升序 
         .select('name sort url publish actionType thirdPropertyNames createTime updateTime')
         .lean()
         .exec(function(err, data) {
@@ -68,7 +68,7 @@ exports.get = async function(req, res, next) {
     navModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .sort({'sort':-1}) // -1 降序 1 升序 
+        .sort({ 'sort': -1 }) // -1 降序 1 升序 
         .select('name sort url publish actionType thirdPropertyNames createTime updateTime')
         .lean()
         .exec(function(err, data) {
@@ -200,7 +200,7 @@ exports.modify = async function(req, res, next) {
     }
     var param = req.body
     var _id = param._id
- 
+
     var data = {
         'name': param.name,
         'url': param.url,
@@ -322,4 +322,32 @@ exports.downNav = async function(req, res, next) {
             'msg': results
         });
     })
+}
+
+/**
+ *
+ * 活动类型
+ * @Author   suqinhai
+ * @Contact  467456744@qq.com
+ * @DateTime 2017-08-09
+ * @return   {[type]}              [description]
+ */
+exports.activityActionTypeof = async function(req, res, next) {
+    goodsDetails.find({})
+        .select('promoType')
+        .exec(function(err, results) {
+            err ? res.send(err) : '';
+            var arr = [];
+            var len = results.length;
+            for(var i = 0; i < len; i++){
+                if ( arr.join().indexOf(results[i].promoType) == -1 ) {
+                    arr.push(results[i])
+                }
+            }
+
+            res.status(200).json({
+                'code': '1',
+                'msg': arr
+            });
+        })
 }

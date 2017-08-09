@@ -47,6 +47,7 @@ exports.getProperty = async function(req, res, next) {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .select('name url sort createTime updateTime')
+        .sort({'sort':-1}) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';

@@ -37,6 +37,19 @@ exports.dataFormat = function(t, format) {
 }
 
 /**
+ *
+ * 去除前后空格
+ * @Author   suqinhai
+ * @Contact  467456744@qq.com
+ * @DateTime 2017-08-09
+ * @param    {[type]}         str [description]
+ */
+exports.trim = function(str) {
+    return str.replace(/(^\s*)|(\s*$)/g, ""); 
+}
+
+
+/**
  * 字符串md5加密
  * @Author   suqinhai
  * @Contact  467456744@qq.com
