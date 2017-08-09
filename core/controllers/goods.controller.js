@@ -136,18 +136,16 @@ exports.getActivityClassGoods = async function(req, res, next) {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .select('goodId brand popular sellerPromise payMethod promoType goldSellers mainPic detailsPic')
-        .populate('goodId','auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
+        .populate('goodId','-_id auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
             var len = data.length;
-            console.log(len)
-            for (var i = 0; i < len; i++){
 
-                for ( var j in data[i].goodId  ){
-                   
-                    data[i][j] = data[i].goodId[j]
-                   
+            for (var i = 0; i < len; i++){
+                var goodId = data[i].goodId
+                for ( var j in  goodId ){
+                    data[i][j] = goodId[j]
                 }
             }
 
