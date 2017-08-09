@@ -122,22 +122,35 @@ exports.getActivityClassGoods = async function(req, res, next) {
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
 
-    data.publish = 1;
-    data.activityClass = param.activityClass;
+    // data.publish = 1;
 
-    var count = await goodsModel.count(data)
+    data.promoType = param.activityClass;
+
+    var count = await goodsDetails.count(data)
         .exec(function(err, count) {
             err ? res.send(err) : '';
             return count
         })
 
-    goodsModel.find(data)
+    goodsDetails.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .sort(sort) // -1 降序 1 升序 
+        .select('goodId brand popular sellerPromise payMethod promoType goldSellers mainPic detailsPic')
+        .populate('goodId','auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
+            var len = data.length;
+            console.log(len)
+            for (var i = 0; i < len; i++){
+
+                for ( var j in data[i].goodId  ){
+                   
+                    data[i][j] = data[i].goodId[j]
+                   
+                }
+            }
+
             res.status(200).json({
                 'code': '1',
                 'count': count,

@@ -69,7 +69,7 @@ exports.get = async function(req, res, next) {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .sort({ 'sort': -1 }) // -1 降序 1 升序 
-        .select('name sort url publish actionType thirdPropertyNames createTime updateTime')
+        .select('name sort url publish thirdPropertyNames createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -333,7 +333,10 @@ exports.downNav = async function(req, res, next) {
  * @return   {[type]}              [description]
  */
 exports.activityActionTypeof = async function(req, res, next) {
-    goodsDetails.find({})
+    var param = req.query || req.params
+    var data = {}
+    param.name ? data.name = new RegExp(param.name) : '';
+    goodsDetails.find(data)
         .select('promoType')
         .exec(function(err, results) {
             err ? res.send(err) : '';
@@ -347,7 +350,8 @@ exports.activityActionTypeof = async function(req, res, next) {
 
             res.status(200).json({
                 'code': '1',
-                'msg': arr
+                'list': arr
             });
+
         })
 }

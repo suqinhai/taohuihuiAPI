@@ -15,9 +15,8 @@ const navSchema = new mongoose.Schema({
 		required: true
 	},
 	'actionType':{
-		type: String,
+		type: Array,
 		required: true,
-		enum:['popular','taoSnap','tmall','special','brand','goldSellers','overseas','cheap'] //超级人气榜 淘抢购 天猫商品 天天特价  品牌直购  金牌卖家 海淘  聚划算  
 	},
 	'publish':{
 		type: Number,
