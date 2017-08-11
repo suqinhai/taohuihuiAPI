@@ -15,7 +15,7 @@ const navSchema = new mongoose.Schema({
 		required: true
 	},
 	'actionType':{
-		type: Array,
+		type: String,
 		required: true,
 	},
 	'publish':{

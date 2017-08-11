@@ -117,38 +117,36 @@ exports.getActivityClassGoods = async function(req, res, next) {
         }
     })
 
-    var data = {}
+    var goodIds = [];
     var param = req.query
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
+    var data = {promoType:{$in:param.activityClass}}
 
-    // data.publish = 1;
+  
+    var goodId = await goodsDetails.find(data)
+        .skip((page - 1) * pageSize)
+        .limit(pageSize)
+        .select('goodId')
 
-    data.promoType = param.activityClass;
+    goodId.forEach(function(val,index){
+       goodIds.push(val.goodId)
+    })
 
-    var count = await goodsDetails.count(data)
+    var count = await goodsModel.count({'_id':{$in:goodIds},'publish':1})
         .exec(function(err, count) {
             err ? res.send(err) : '';
             return count
         })
 
-    goodsDetails.find(data)
+    var goodIds = goodsModel.find({'_id':{$in:goodIds},'publish':1})
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .select('goodId brand popular sellerPromise payMethod promoType goldSellers mainPic detailsPic')
-        .populate('goodId','-_id auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
+        .select('auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
             var len = data.length;
-
-            for (var i = 0; i < len; i++){
-                var goodId = data[i].goodId
-                for ( var j in  goodId ){
-                    data[i][j] = goodId[j]
-                }
-            }
-
             res.status(200).json({
                 'code': '1',
                 'count': count,

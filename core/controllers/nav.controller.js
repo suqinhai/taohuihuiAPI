@@ -28,7 +28,7 @@ exports.getNav = async function(req, res, next) {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .sort({ 'sort': -1 }) // -1 降序 1 升序 
-        .select('name sort url publish actionType thirdPropertyNames createTime updateTime')
+        .select('name sort url publish actionType createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -69,7 +69,7 @@ exports.get = async function(req, res, next) {
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .sort({ 'sort': -1 }) // -1 降序 1 升序 
-        .select('name sort url publish thirdPropertyNames createTime updateTime')
+        .select('name sort url publish actionType createTime updateTime')
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -139,6 +139,7 @@ exports.add = async function(req, res, next) {
         'createTime': util.dataFormat(new Date()),
         'updateTime': util.dataFormat(new Date()),
     };
+
     navModel.create(data, function(err, data) {
         err ? res.send(err) : '';
         res.status(200).json({
@@ -208,6 +209,7 @@ exports.modify = async function(req, res, next) {
         'actionType': param.actionType,
         'updateTime': util.dataFormat(new Date())
     };
+    console.log(param.actionType)
     navModel.update({ '_id': _id }, data, function(err, data) {
         err ? res.send(err) : '';
         res.status(200).json({
