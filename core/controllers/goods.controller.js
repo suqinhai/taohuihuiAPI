@@ -36,7 +36,7 @@ exports.get = async function(req, res, next) {
     goodsModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .sort({'sort':-1}) // -1 降序 1 升序 
+        .sort({ 'sort': -1 }) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -78,7 +78,7 @@ exports.getItem = async function(req, res, next) {
     goodsModel.find(data)
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .sort({'sort':-1}) // -1 降序 1 升序 
+        .sort({ 'sort': -1 }) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -107,7 +107,7 @@ exports.getItem = async function(req, res, next) {
  * @return   {[type]}        [description]
  */
 exports.getActivityClassGoods = async function(req, res, next) {
-    
+
     req.checkQuery({
         'activityClass': {
             notEmpty: {
@@ -121,25 +121,22 @@ exports.getActivityClassGoods = async function(req, res, next) {
     var param = req.query
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
-    var data = {promoType:{$in:param.activityClass}}
+    var data = { promoType: { $in: param.activityClass } }
 
-  
+
     var goodId = await goodsDetails.find(data)
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
-        .select('goodId')
-
-    goodId.forEach(function(val,index){
-       goodIds.push(val.goodId)
+        
+    goodId.forEach(function(val, index) {
+        goodIds.push(val.goodId)
     })
 
-    var count = await goodsModel.count({'_id':{$in:goodIds},'publish':1})
+    var count = await goodsModel.count({ '_id': { $in: goodIds }, 'publish': 1 })
         .exec(function(err, count) {
             err ? res.send(err) : '';
             return count
         })
 
-    var goodIds = goodsModel.find({'_id':{$in:goodIds},'publish':1})
+    var goodIds = goodsModel.find({ '_id': { $in: goodIds }, 'publish': 1 })
         .skip((page - 1) * pageSize)
         .limit(pageSize)
         .select('auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
@@ -275,7 +272,7 @@ exports.getSearchGoods = async function(req, res, next) {
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
     param.name ? data.title = new RegExp(param.name) : '';
     // 商品名称
-     // 销量降序
+    // 销量降序
     if (param.biz30day == 'desc') {
         var sort = { 'biz30day': -1 }
     }
@@ -364,7 +361,7 @@ exports.getDetails = async function(req, res, next) {
     })
 
     console.log(req.query._id)
-    
+
     var param = req.query
     var page = parseInt((param.page ? param.page : 1));
     var pageSize = parseInt((param.pageSize ? param.pageSize : 30));
@@ -383,10 +380,10 @@ exports.getDetails = async function(req, res, next) {
 
     goodsDetails.findOne(data)
         .select('goodId brand popular sellerPromise payMethod promoType goldSellers mainPic detailsPic')
-        .populate('goodId','auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
+        .populate('goodId', 'auctionId auctionUrl reservePrice biz30day clickUrl couponAmount couponEffectiveEndTime couponEffectiveStartTime couponInfo couponLeftCount couponLink couponLinkTaoToken couponShortLinkUrl couponStartFee couponTotalCount shopTitle pictUrl taoToken title tkCommFee tkRate zkPrice userType category sort publish createTime updateTime')
         .skip((page - 1) * pageSize)
         .limit(pageSize)
-        .sort({'sort':-1}) // -1 降序 1 升序 
+        .sort({ 'sort': -1 }) // -1 降序 1 升序 
         .lean()
         .exec(function(err, data) {
             err ? res.send(err) : '';
@@ -570,5 +567,3 @@ exports.del = function(req, res, next) {
             });
         })
 }
-
-

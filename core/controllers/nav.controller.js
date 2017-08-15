@@ -4,6 +4,7 @@ const util = require('../util/util.js');
 const navModel = require('../models/nav.model.js');
 const thirdPropertyModel = require('../models/thirdProperty.model.js');
 const goodsDetails = require('../models/goodsDetails.model.js');
+const goodsModel = require('../models/goods.model.js');
 /**
  * 获取前台首页导航列表
  * @Author   suqinhai
@@ -336,23 +337,27 @@ exports.downNav = async function(req, res, next) {
  */
 exports.activityActionTypeof = async function(req, res, next) {
     var param = req.query || req.params
-    var data = {}
+    var data = {'promoType':{'$nin':[null,'']}}
     param.name ? data.name = new RegExp(param.name) : '';
-    goodsDetails.find(data)
+    goodsModel.find(data)
         .select('promoType')
         .exec(function(err, results) {
             err ? res.send(err) : '';
             var arr = [];
-            var len = results.length;
-            for(var i = 0; i < len; i++){
-                if ( arr.join().indexOf(results[i].promoType) == -1 ) {
-                    arr.push(results[i])
+            var dataArr = [];
+            var data  = JSON.parse(JSON.stringify(results));
+            var len = data.length;
+
+            for (var i = 0; i < len; i++){
+                if ( arr.join(',').indexOf(data[i].promoType) == -1 && data[i].promoType){
+                    dataArr.push(data[i])
+                    arr.push(data[i].promoType)
                 }
             }
 
             res.status(200).json({
                 'code': '1',
-                'list': arr
+                'list': dataArr
             });
 
         })
